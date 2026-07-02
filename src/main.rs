@@ -1,99 +1,52 @@
-use std::{
-    borrow::Cow,
-    fs::read_to_string,
-    io::{self, stdout},
-};
+use std::error::Error;
+use std::io::{self, stdout};
 
-use crossterm::{
+use ratatui::crossterm::{
     ExecutableCommand,
     event::{Event, KeyCode, read},
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use ratatui::crossterm;
-use ratatui::{
-    prelude::*,
-    widgets::{Block, BorderType, Borders, Clear, FrameExt, Paragraph},
-};
+use ratatui::prelude::*;
+use ratatui::widgets::FrameExt as _;
+use ratatui_explorer::{FileExplorerBuilder, Theme};
 
-use ratatui_explorer::{File, FileExplorerBuilder, Theme};
-
-fn main() -> io::Result<()> {
+fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
     stdout().execute(EnterAlternateScreen)?;
-
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
-    let layout = Layout::horizontal([Constraint::Ratio(1, 3), Constraint::Ratio(2, 3)]);
 
-    // Create a new file explorer with the default theme and title. Show hidden files.
-    let mut file_explorer = FileExplorerBuilder::default()
-        .theme(get_theme())
-        .show_hidden(true)
-        .build()?;
-
-    loop {
-        // Get the content of the current selected file (if it's indeed a file).
-        let file_content = get_file_content(file_explorer.current());
-
-        let file_content = match file_content {
-            Ok(file_content) => file_content,
-            _ => "Couldn't load file.".into(),
-        };
-
-        // Render the file explorer widget and the file content.
-        terminal.draw(|f| {
-            let chunks = layout.split(f.area());
-
-            f.render_widget_ref(file_explorer.widget(), chunks[0]);
-            f.render_widget(Clear, chunks[1]);
-            f.render_widget(
-                Paragraph::new(file_content).block(
-                    Block::default()
-                        .borders(Borders::ALL)
-                        .border_type(BorderType::Double),
-                ),
-                chunks[1],
-            );
-        })?;
-
-        // Read the next event from the terminal.
-        let event = read()?;
-        if let Event::Key(key) = event
-            && key.code == KeyCode::Char('q')
-        {
-            break;
-        }
-        // Handle the event in the file explorer.
-        file_explorer.handle(&event)?;
-    }
-
+    let res = run(&mut terminal);
     disable_raw_mode()?;
     stdout().execute(LeaveAlternateScreen)?;
+
+    if let Ok(do_print) = res {
+        if do_print {
+            println!("hello");
+        }
+    } else if let Err(err) = res {
+        println!("{err:?}");
+    }
     Ok(())
 }
 
-fn get_file_content(file: &File) -> io::Result<Cow<'_, str>> {
-    // If the path is a file, read its content.
-    if file.is_file() {
-        read_to_string(&file.path).map(Into::into)
-    } else if file.is_dir {
-        Ok("".into())
-    } else {
-        Ok("<not a regular file>".into())
-    }
-}
+fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<bool>
+where
+    io::Error: From<B::Error>,
+{
+    let theme = Theme::default().add_default_title();
+    let mut file_explorer = FileExplorerBuilder::build_with_theme(theme)?;
+    loop {
+        terminal.draw(|f| {
+            f.render_widget_ref(file_explorer.widget(), f.area());
+        })?;
 
-fn get_theme() -> Theme {
-    Theme::default()
-        .with_dir_style(
-            Style::default()
-                .fg(Color::White)
-                .add_modifier(Modifier::BOLD),
-        )
-        .with_highlight_dir_style(
-            Style::default()
-                .fg(Color::White)
-                .add_modifier(Modifier::BOLD)
-                .bg(Color::DarkGray),
-        )
-        .with_scroll_padding(1)
+        let event = read()?;
+        if let Event::Key(key) = event {
+            if key.code == KeyCode::Char('q') {
+                break Ok(false);
+            }
+        }
+
+        file_explorer.handle(&event)?;
+    }
 }
