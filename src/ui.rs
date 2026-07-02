@@ -31,13 +31,15 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer) {
     f.render_widget(title, chunks[0]);
 
     // MAIN CHUNKS
-
+    // EXPLORER
     let main_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(30), Constraint::Percentage(70)])
         .split(chunks[1]);
 
     f.render_widget_ref(fe.widget(), main_chunks[0]);
+
+    // PREVIEW
 
     let lorem = { Span::styled("Lorem ipsum", Style::default().fg(Color::Red)) };
 
