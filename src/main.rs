@@ -1,14 +1,15 @@
-use std::error::Error;
-use std::io::{self, stdout};
-
+use crate::ui::ui;
 use ratatui::crossterm::{
     ExecutableCommand,
     event::{Event, KeyCode, read},
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
 use ratatui::prelude::*;
-use ratatui::widgets::FrameExt as _;
 use ratatui_explorer::{FileExplorerBuilder, Theme};
+use std::error::Error;
+use std::io::{self, stdout};
+
+mod ui;
 
 fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
@@ -28,14 +29,10 @@ fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<bool>
 where
     io::Error: From<B::Error>,
 {
-    let layout = Layout::horizontal([Constraint::Ratio(1, 3), Constraint::Ratio(2, 3)]);
     let theme = Theme::default().add_default_title();
     let mut file_explorer = FileExplorerBuilder::build_with_theme(theme)?;
     loop {
-        terminal.draw(|f| {
-            let chunks = layout.split(f.area());
-            f.render_widget_ref(file_explorer.widget(), chunks[0]);
-        })?;
+        terminal.draw(|f| ui(f, &mut file_explorer))?;
 
         let event = read()?;
         if let Event::Key(key) = event {
@@ -43,7 +40,6 @@ where
                 break Ok(false);
             }
         }
-
         file_explorer.handle(&event)?;
     }
 }
