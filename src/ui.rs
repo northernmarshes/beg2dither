@@ -12,8 +12,7 @@ use ratatui_image::Image;
 use crate::app::App;
 
 pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
-    // CHUNKS
-
+    // VERTICSL CHUNKS
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -24,7 +23,6 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
         .split(f.area());
 
     // TITLE
-    //
     let title_block = Block::default()
         .borders(Borders::ALL)
         .style(Style::default());
@@ -36,25 +34,19 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
     f.render_widget(title, chunks[0]);
 
     // MAIN CHUNKS
-    // EXPLORER
     let main_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(30), Constraint::Percentage(70)])
         .split(chunks[1]);
 
+    // EXPLORER
     f.render_widget_ref(fe.widget(), main_chunks[0]);
 
     // PREVIEW
-    //
-    let image = Image::new(&app.image);
+    // TODO: panics here because of wrong file type
+    let protocol = App::render(&app.path).unwrap();
+    let image = Image::new(&protocol);
     f.render_widget(image, main_chunks[1]);
-
-    // let lorem = { Span::styled("Lorem ipsum", Style::default().fg(Color::Red)) };
-    //
-    // let placeholder_main =
-    //     Paragraph::new(Line::from(lorem)).block(Block::default().borders(Borders::ALL));
-
-    // f.render_widget(placeholder_main, main_chunks[1]);
 
     // FOOTER
 

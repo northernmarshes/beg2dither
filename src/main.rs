@@ -6,7 +6,6 @@ use ratatui::crossterm::{
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
 use ratatui::prelude::*;
-use ratatui_explorer::{FileExplorerBuilder, Theme};
 use std::error::Error;
 use std::io::{self, stdout};
 
@@ -33,8 +32,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
 where
     io::Error: From<B::Error>,
 {
-    let theme = Theme::default().add_default_title();
-    let mut file_explorer = FileExplorerBuilder::build_with_theme(theme)?;
+    let mut file_explorer = App::get_explorer().unwrap();
     loop {
         terminal.draw(|f| ui(f, &mut file_explorer, app))?;
 
@@ -48,6 +46,8 @@ where
                 break Ok(false);
             }
         }
+        // TODO: pass only files' path not folders
+        app.title = file_explorer.current().path.display().to_string();
         file_explorer.handle(&event)?;
     }
 }
