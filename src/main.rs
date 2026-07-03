@@ -1,3 +1,4 @@
+use crate::app::App;
 use crate::ui::ui;
 use ratatui::crossterm::{
     ExecutableCommand,
@@ -9,13 +10,16 @@ use ratatui_explorer::{FileExplorerBuilder, Theme};
 use std::error::Error;
 use std::io::{self, stdout};
 
+mod app;
 mod ui;
 
 fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
     stdout().execute(EnterAlternateScreen)?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
-    let res = run(&mut terminal);
+
+    let mut app = App::new();
+    let res = run(&mut terminal, &mut app);
     disable_raw_mode()?;
     stdout().execute(LeaveAlternateScreen)?;
 
@@ -25,14 +29,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<bool>
+fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<bool>
 where
     io::Error: From<B::Error>,
 {
     let theme = Theme::default().add_default_title();
     let mut file_explorer = FileExplorerBuilder::build_with_theme(theme)?;
     loop {
-        terminal.draw(|f| ui(f, &mut file_explorer))?;
+        terminal.draw(|f| ui(f, &mut file_explorer, app))?;
 
         let event = read()?;
         if let Event::Key(key) = event {

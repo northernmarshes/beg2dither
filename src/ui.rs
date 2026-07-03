@@ -8,7 +8,9 @@ use ratatui::widgets::FrameExt as _;
 use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui_explorer::FileExplorer;
 
-pub fn ui(f: &mut Frame, fe: &mut FileExplorer) {
+use crate::app::App;
+
+pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
     // CHUNKS
 
     let chunks = Layout::default()
@@ -21,12 +23,14 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer) {
         .split(f.area());
 
     // TITLE
+    //
     let title_block = Block::default()
         .borders(Borders::ALL)
         .style(Style::default());
 
-    let title = Paragraph::new(Text::styled("RATADOT", Style::default().fg(Color::Green)))
-        .block(title_block);
+    let word = &app.title;
+    let title =
+        Paragraph::new(Text::styled(word, Style::default().fg(Color::Green))).block(title_block);
 
     f.render_widget(title, chunks[0]);
 
