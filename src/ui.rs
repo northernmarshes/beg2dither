@@ -7,6 +7,7 @@ use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::FrameExt as _;
 use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui_explorer::FileExplorer;
+use ratatui_image::Image;
 
 use crate::app::App;
 
@@ -44,13 +45,16 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
     f.render_widget_ref(fe.widget(), main_chunks[0]);
 
     // PREVIEW
+    //
+    let image = Image::new(&app.image);
+    f.render_widget(image, main_chunks[1]);
 
-    let lorem = { Span::styled("Lorem ipsum", Style::default().fg(Color::Red)) };
+    // let lorem = { Span::styled("Lorem ipsum", Style::default().fg(Color::Red)) };
+    //
+    // let placeholder_main =
+    //     Paragraph::new(Line::from(lorem)).block(Block::default().borders(Borders::ALL));
 
-    let placeholder_main =
-        Paragraph::new(Line::from(lorem)).block(Block::default().borders(Borders::ALL));
-
-    f.render_widget(placeholder_main, main_chunks[1]);
+    // f.render_widget(placeholder_main, main_chunks[1]);
 
     // FOOTER
 

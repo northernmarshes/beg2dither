@@ -19,7 +19,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
     let mut app = App::new();
-    let res = run(&mut terminal, &mut app);
+    let res = run_app(&mut terminal, &mut app);
     disable_raw_mode()?;
     stdout().execute(LeaveAlternateScreen)?;
 
@@ -29,7 +29,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<bool>
+fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<bool>
 where
     io::Error: From<B::Error>,
 {
@@ -41,6 +41,10 @@ where
         let event = read()?;
         if let Event::Key(key) = event {
             if key.code == KeyCode::Char('q') {
+                break Ok(false);
+            }
+            // placeholder keybinding
+            if key.code == KeyCode::Char('w') {
                 break Ok(false);
             }
         }
