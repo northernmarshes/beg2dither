@@ -7,7 +7,9 @@ use ratatui::crossterm::{
 };
 use ratatui::prelude::*;
 use std::error::Error;
+use std::ffi::OsStr;
 use std::io::{self, stdout};
+use std::path::Path;
 
 mod app;
 mod ui;
@@ -46,8 +48,17 @@ where
                 break Ok(false);
             }
         }
-        // TODO: pass only files' path not folders
-        app.title = file_explorer.current().path.display().to_string();
         file_explorer.handle(&event)?;
+
+        // TODO: pass only files' path not folders
+        let image_extensions = ["jpg", "png"];
+        let img_path = file_explorer.current().path.display().to_string();
+        let extension = get_extension_from_filename(&img_path).unwrap_or("../assets/01.png");
+        if image_extensions.contains(&extension) {
+            app.path = img_path;
+        }
     }
+}
+fn get_extension_from_filename(filename: &str) -> Option<&str> {
+    Path::new(filename).extension().and_then(OsStr::to_str)
 }
