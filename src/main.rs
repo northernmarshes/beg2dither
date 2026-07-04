@@ -51,7 +51,7 @@ where
         file_explorer.handle(&event)?;
 
         // TODO: pass only files' path not folders
-        let image_extensions = ["jpg", "png"];
+        let image_extensions = ["jpg", "png", "JPG"];
         let img_path = file_explorer.current().path.display().to_string();
         let extension = get_extension_from_filename(&img_path).unwrap_or("../assets/01.png");
         if image_extensions.contains(&extension) {

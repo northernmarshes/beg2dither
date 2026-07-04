@@ -1,4 +1,5 @@
 use ratatui::Frame;
+use ratatui::layout::Alignment;
 use ratatui::layout::Constraint;
 use ratatui::layout::Direction;
 use ratatui::layout::Layout;
@@ -8,6 +9,8 @@ use ratatui::widgets::FrameExt as _;
 use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui_explorer::FileExplorer;
 use ratatui_image::Image;
+// use ratatui_image::{Image, Resize, picker::Picker};
+// use ratatui::layout::Size;
 
 use crate::app::App;
 
@@ -28,8 +31,9 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
         .style(Style::default());
 
     let word = &app.title;
-    let title =
-        Paragraph::new(Text::styled(word, Style::default().fg(Color::Green))).block(title_block);
+    let title = Paragraph::new(Text::styled(word, Style::default().fg(Color::Green)))
+        .alignment(Alignment::Center)
+        .block(title_block);
 
     f.render_widget(title, chunks[0]);
 
@@ -43,7 +47,21 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
     f.render_widget_ref(fe.widget(), main_chunks[0]);
 
     // PREVIEW
-    // TODO: panics here because of wrong file type
+    // Trying to resize the image
+    // let picker = Picker::halfblocks();
+    // let dyn_img = image::ImageReader::open(&app.path)
+    //     .unwrap()
+    //     .decode()
+    //     .unwrap();
+    // let font_size = picker.font_size();
+    // let size = Size::new(
+    //     dyn_img.width().div_ceil(font_size.width as u32) as u16,
+    //     dyn_img.height().div_ceil(font_size.height as u32) as u16,
+    // );
+    // let protocol = picker
+    //     .new_protocol(dyn_img, size, Resize::Fit(None))
+    //     .unwrap();
+
     let protocol = App::render(&app.path).unwrap();
     let image = Image::new(&protocol);
     f.render_widget(image, main_chunks[1]);
@@ -54,11 +72,13 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
 
     let current_keys_hint = { Span::styled("(q) to quit", Style::default().fg(Color::Red)) };
 
-    let placeholder_footer =
-        Paragraph::new(Line::from(current_keys_hint)).block(Block::default().borders(Borders::ALL));
+    let placeholder_footer = Paragraph::new(Line::from(current_keys_hint))
+        .alignment(Alignment::Center)
+        .block(Block::default().borders(Borders::ALL));
 
-    let key_notes_footer =
-        Paragraph::new(Line::from(placeholder)).block(Block::default().borders(Borders::ALL));
+    let key_notes_footer = Paragraph::new(Line::from(placeholder))
+        .alignment(Alignment::Center)
+        .block(Block::default().borders(Borders::ALL));
 
     let footer_chunks = Layout::default()
         .direction(Direction::Horizontal)

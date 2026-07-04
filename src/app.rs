@@ -17,7 +17,7 @@ fn size() -> Size {
 impl App {
     pub fn new() -> App {
         let title = "RATADOT".to_string();
-        let path: String = "./assets/01.png".to_string();
+        let path: String = "./assets/dc01.JPG".to_string();
         let image = App::render(&path).unwrap();
         App { title, path, image }
     }
@@ -39,7 +39,7 @@ impl App {
 
     /// Get file explorer showing only pictures and directories
     pub fn get_explorer() -> Result<FileExplorer, Box<dyn Error>> {
-        const SUPPORTED_FORMATS: [&str; 2] = ["jpg", "png"];
+        const SUPPORTED_FORMATS: [&str; 3] = ["jpg", "png", "JPG"];
         let theme = Theme::default().add_default_title();
         let mut file_explorer = FileExplorerBuilder::build_with_theme(theme)?;
         file_explorer.set_filter_map(|file| {
