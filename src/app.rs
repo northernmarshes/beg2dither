@@ -3,6 +3,8 @@ use ratatui_explorer::{FileExplorer, FileExplorerBuilder, Theme};
 use ratatui_image::picker::cap_parser::QueryStdioOptions;
 use ratatui_image::{Resize, picker::Picker, protocol::Protocol};
 use std::error::Error;
+use std::ffi::OsStr;
+use std::path::Path;
 
 pub struct App {
     pub title: String,
@@ -22,6 +24,7 @@ impl App {
         App { title, path, image }
     }
 
+    /// Render the image
     pub fn render(path: &String) -> Result<Protocol, ratatui_image::errors::Errors> {
         let image_source = image::ImageReader::open(path)?.decode()?;
 
@@ -53,5 +56,18 @@ impl App {
             if keep { Some(file) } else { None }
         })?;
         Ok(file_explorer)
+    }
+
+    /// Update path with files with image extension
+    pub fn update_path(&mut self, fe: &FileExplorer) {
+        let image_extensions: [&str; 3] = ["jpg", "png", "JPG"];
+        let img_path = &fe.current().path.display().to_string();
+        let extension = Path::new(img_path)
+            .extension()
+            .and_then(OsStr::to_str)
+            .unwrap_or("../assets/01.png");
+        if image_extensions.contains(&extension) {
+            self.path = img_path.clone();
+        }
     }
 }
