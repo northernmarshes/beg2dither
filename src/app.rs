@@ -1,7 +1,6 @@
 use image::DynamicImage;
-use ratatui::layout::{Rect, Size};
-// use ratatui::widgets::Paragraph;
 use ratatui::Frame;
+use ratatui::layout::{Rect, Size};
 use ratatui::widgets::{Block, Borders};
 use ratatui_explorer::{FileExplorer, FileExplorerBuilder, Theme};
 use ratatui_image::StatefulImage;
@@ -11,7 +10,6 @@ use ratatui_image::{Resize, picker::Picker, protocol::Protocol};
 use std::error::Error;
 use std::ffi::OsStr;
 use std::path::Path;
-// use std::result;
 
 pub struct App {
     pub title: String,
@@ -70,8 +68,7 @@ impl App {
     /// Render resized
     pub fn render_resized(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let state = &mut self.image_scale_state;
-        let name = "Image";
-        let block = block(name);
+        let block = block("Image");
         let inner_area = block.inner(area);
         f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
     }

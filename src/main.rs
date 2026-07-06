@@ -39,6 +39,7 @@ where
         let event = read()?;
         if let Event::Key(key) = event {
             if key.code == KeyCode::Char('q') {
+                app.should_quit = true;
                 break Ok(false);
             }
             // placeholder keybinding
