@@ -1,15 +1,26 @@
-use ratatui::layout::Size;
+use image::DynamicImage;
+use ratatui::layout::{Rect, Size};
+// use ratatui::widgets::Paragraph;
+use ratatui::Frame;
+use ratatui::widgets::{Block, Borders};
 use ratatui_explorer::{FileExplorer, FileExplorerBuilder, Theme};
+use ratatui_image::StatefulImage;
 use ratatui_image::picker::cap_parser::QueryStdioOptions;
+use ratatui_image::protocol::StatefulProtocol;
 use ratatui_image::{Resize, picker::Picker, protocol::Protocol};
 use std::error::Error;
 use std::ffi::OsStr;
 use std::path::Path;
+// use std::result;
 
 pub struct App {
     pub title: String,
+    pub should_quit: bool,
     pub path: String,
     pub image: Protocol,
+    pub image_source: DynamicImage,
+    pub picker: Picker,
+    pub image_scale_state: StatefulProtocol,
 }
 
 fn size() -> Size {
@@ -21,7 +32,23 @@ impl App {
         let title = "RATADOT".to_string();
         let path: String = "./assets/dc01.JPG".to_string();
         let image = App::render(&path).unwrap();
-        App { title, path, image }
+        let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
+        let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
+            terminal_background_color_osc: true,
+            text_sizing_protocol: true,
+            ..Default::default()
+        })
+        .unwrap();
+        let image_scale_state = picker.new_resize_protocol(image_source.clone());
+        App {
+            title,
+            should_quit: false,
+            path,
+            image,
+            image_source,
+            picker,
+            image_scale_state,
+        }
     }
 
     /// Render the image
@@ -38,6 +65,15 @@ impl App {
             .new_protocol(image_source.clone(), size(), Resize::Fit(None))
             .expect("demo gets a protocol from image");
         Ok(image_static)
+    }
+
+    /// Render resized
+    pub fn render_resized(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
+        let state = &mut self.image_scale_state;
+        let name = "Image";
+        let block = block(name);
+        let inner_area = block.inner(area);
+        f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
     }
 
     /// Get file explorer showing only pictures and directories
@@ -59,7 +95,7 @@ impl App {
     }
 
     /// Update path with files with image extension
-    pub fn update_path(&mut self, fe: &FileExplorer) {
+    pub fn update(&mut self, fe: &FileExplorer) {
         let image_extensions: [&str; 3] = ["jpg", "png", "JPG"];
         let img_path = &fe.current().path.display().to_string();
         let extension = Path::new(img_path)
@@ -68,6 +104,15 @@ impl App {
             .unwrap_or("../assets/01.png");
         if image_extensions.contains(&extension) {
             self.path = img_path.clone();
+            self.image_source = image::ImageReader::open(&self.path)
+                .unwrap()
+                .decode()
+                .unwrap();
+            self.image_scale_state = self.picker.new_resize_protocol(self.image_source.clone());
         }
     }
+}
+
+fn block(name: &str) -> Block<'_> {
+    Block::default().borders(Borders::ALL).title(name)
 }

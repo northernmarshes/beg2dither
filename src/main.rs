@@ -43,10 +43,10 @@ where
             }
             // placeholder keybinding
             if key.code == KeyCode::Char('w') {
-                break Ok(false);
+                app.title = "hej hej".to_string();
             }
         }
         file_explorer.handle(&event)?;
-        app.update_path(&file_explorer);
+        app.update(&file_explorer);
     }
 }

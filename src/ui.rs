@@ -8,13 +8,14 @@ use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::FrameExt as _;
 use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui_explorer::FileExplorer;
-use ratatui_image::Image;
+// use ratatui_image::Image;
+use ratatui_image::Resize;
 // use ratatui_image::{Image, Resize, picker::Picker};
 // use ratatui::layout::Size;
 
 use crate::app::App;
 
-pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
+pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     // VERTICSL CHUNKS
     let chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -62,9 +63,11 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &App) {
     //     .new_protocol(dyn_img, size, Resize::Fit(None))
     //     .unwrap();
 
-    let protocol = App::render(&app.path).unwrap();
-    let image = Image::new(&protocol);
-    f.render_widget(image, main_chunks[1]);
+    // let protocol = App::render(&app.path).unwrap();
+    // let image = Image::new(&protocol);
+    // f.render_widget(image, main_chunks[1]);
+
+    app.render_resized(f, Resize::Scale(None), main_chunks[1]);
 
     // FOOTER
 
