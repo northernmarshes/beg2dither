@@ -52,11 +52,12 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     // f.render_widget(dithered, area);
     f.render_widget(block, main_chunks[1]);
 
-    let dither_placeholder = { Span::styled("DITHERED IMAGE", Style::default().fg(Color::Red)) };
+    // let dither_placeholder = { Span::styled("DITHERED IMAGE", Style::default().fg(Color::Red)) };
+
     match app.show_image {
         ShowImage::Raw => app.render_resized(f, Resize::Scale(None), area),
-        // ShowImage::FloydSteinberg => app.render_floyd_steinberg(f),
-        ShowImage::FloydSteinberg => f.render_widget(dither_placeholder, area),
+        ShowImage::FloydSteinberg => app.render_floyd_steinberg(f),
+        // ShowImage::FloydSteinberg => f.render_widget(dither_placeholder, area),
     }
 
     // FOOTER
