@@ -1,4 +1,4 @@
-use crate::app::App;
+use crate::app::{App, ShowImage};
 use crate::ui::ui;
 use ratatui::crossterm::{
     ExecutableCommand,
@@ -44,7 +44,8 @@ where
             }
             // placeholder keybinding
             if key.code == KeyCode::Char('w') {
-                app.title = "hej hej".to_string();
+                app.title = "dithered!".to_string();
+                app.show_image = ShowImage::FloydSteinberg;
             }
         }
         file_explorer.handle(&event)?;

@@ -1,3 +1,5 @@
+use dithers::dither::{DitherMethod, dither, open_image, save_image};
+use dithers::palette::ColorPalette;
 use image::DynamicImage;
 use ratatui::Frame;
 use ratatui::layout::{Rect, Size};
@@ -10,12 +12,25 @@ use ratatui_image::{Resize, picker::Picker, protocol::Protocol};
 use std::error::Error;
 use std::ffi::OsStr;
 use std::path::Path;
+// use std::path::PathBuf;
+
+pub enum ShowImage {
+    Raw,
+    FloydSteinberg,
+}
+// pub struct DitheredImage {
+//     pub buffer: Vec<u8>,
+//     pub width: u32,
+//     pub height: u32,
+// }
 
 pub struct App {
     pub title: String,
     pub should_quit: bool,
     pub path: String,
     pub image: Protocol,
+    pub show_image: ShowImage,
+    // pub dithered_image: DitheredImage,
     pub image_source: DynamicImage,
     pub picker: Picker,
     pub image_scale_state: StatefulProtocol,
@@ -37,12 +52,15 @@ impl App {
             ..Default::default()
         })
         .unwrap();
+        // let dithered_image:
         let image_scale_state = picker.new_resize_protocol(image_source.clone());
         App {
             title,
             should_quit: false,
             path,
             image,
+            show_image: ShowImage::Raw,
+            // dithered_image,
             image_source,
             picker,
             image_scale_state,
@@ -72,6 +90,22 @@ impl App {
         let inner_area = block.inner(area);
         f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
     }
+
+    /// Render Floyd Steinberg
+    // pub fn render_floyd_steinberg(&mut self, f: &mut Frame<'_>) {
+    //     let path = &self.path;
+    //     let (mut buffer, width, height) = open_image(&PathBuf::from(path));
+    //     dither(
+    //         &mut buffer,
+    //         DitherMethod::FloydSteinberg,
+    //         ColorPalette::Monochrome,
+    //         width,
+    //         height,
+    //     );
+    //     // save_image(buffer, PathBuf::from("output.png"), width, height);
+    //     // TODO: pass dithered image to a variable
+    //     f.render_widget(dithered, area);
+    // }
 
     /// Get file explorer showing only pictures and directories
     pub fn get_explorer() -> Result<FileExplorer, Box<dyn Error>> {

@@ -11,6 +11,7 @@ use ratatui_explorer::FileExplorer;
 use ratatui_image::Resize;
 
 use crate::app::App;
+use crate::app::ShowImage;
 
 pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     // VERTICSL CHUNKS
@@ -47,8 +48,16 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     let block = Block::default().borders(Borders::ALL).title("Image");
     let area = block.inner(main_chunks[1]);
 
-    app.render_resized(f, Resize::Scale(None), area);
+    // let dithered = self.render_floyd_steinberg(f);
+    // f.render_widget(dithered, area);
     f.render_widget(block, main_chunks[1]);
+
+    let dither_placeholder = { Span::styled("DITHERED IMAGE", Style::default().fg(Color::Red)) };
+    match app.show_image {
+        ShowImage::Raw => app.render_resized(f, Resize::Scale(None), area),
+        // ShowImage::FloydSteinberg => app.render_floyd_steinberg(f),
+        ShowImage::FloydSteinberg => f.render_widget(dither_placeholder, area),
+    }
 
     // FOOTER
 
