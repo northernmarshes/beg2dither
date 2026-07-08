@@ -56,7 +56,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
 
     match app.show_image {
         ShowImage::Raw => app.render_resized(f, Resize::Scale(None), area),
-        ShowImage::FloydSteinberg => app.render_floyd_steinberg(f),
+        ShowImage::FloydSteinberg => app.render_floyd_steinberg(f, Resize::Scale(None), area),
         // ShowImage::FloydSteinberg => f.render_widget(dither_placeholder, area),
     }
 

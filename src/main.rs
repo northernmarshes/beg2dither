@@ -42,10 +42,11 @@ where
                 app.should_quit = true;
                 break Ok(false);
             }
-            // placeholder keybinding
-            if key.code == KeyCode::Char('w') {
-                app.title = "dithered!".to_string();
+            if key.code == KeyCode::Char('d') {
                 app.show_image = ShowImage::FloydSteinberg;
+            }
+            if key.code == KeyCode::Char('r') {
+                app.show_image = ShowImage::Raw;
             }
         }
         file_explorer.handle(&event)?;

@@ -1,6 +1,8 @@
 use dithers::dither::{DitherMethod, dither, open_image, save_image};
 use dithers::palette::ColorPalette;
 use image::DynamicImage;
+use image::ImageBuffer;
+use image::Rgb;
 use ratatui::Frame;
 use ratatui::layout::{Rect, Size};
 use ratatui::widgets::{Block, Borders};
@@ -19,11 +21,11 @@ pub enum ShowImage {
     FloydSteinberg,
 }
 
-// pub struct DitheredImage {
-//     pub buffer: Vec<u8>,
-//     pub width: u32,
-//     pub height: u32,
-// }
+pub struct DitherImage {
+    pub buffer: Vec<u8>,
+    pub width: u32,
+    pub height: u32,
+}
 
 pub struct App {
     pub title: String,
@@ -104,15 +106,31 @@ impl App {
             width,
             height,
         );
-        // save_image(buffer, PathBuf::from("output.png"), width, height);
-        
-        // TODO: parse dithered image to a StatefulProtocol
-        let dithered = // something;
-        let dithered_protocol: &mut StatefulProtocol = // something;
-        
+
+        // TODO: simplyfy this manipulation
+        let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
+            ImageBuffer::from_raw(width, height, buffer).unwrap();
+        let dynamic = DynamicImage::from(dithered);
+        let dithered_protocol: &mut StatefulProtocol =
+            &mut self.picker.new_resize_protocol(dynamic.clone());
+
         let block = block("Image");
         let inner_area = block.inner(area);
-        f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, dithered_protocol);
+        f.render_stateful_widget(
+            StatefulImage::new().resize(resize),
+            inner_area,
+            dithered_protocol,
+        );
+    }
+
+    /// Save the dithered image
+    pub fn save_dither(&mut self, image: DitherImage) {
+        let DitherImage {
+            buffer,
+            width,
+            height,
+        } = image;
+        save_image(buffer, PathBuf::from("output.png"), width, height);
     }
 
     /// Get file explorer showing only pictures and directories
