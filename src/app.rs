@@ -31,6 +31,7 @@ pub struct App {
     pub title: String,
     pub should_quit: bool,
     pub path: String,
+    pub algorithm: String,
     pub image: Protocol,
     pub show_image: ShowImage,
     // pub dithered_image: DitheredImage,
@@ -48,6 +49,7 @@ impl App {
     pub fn new() -> App {
         let title = "RATADOT".to_string();
         let path: String = "./assets/dc01.JPG".to_string();
+        let algorithm: String = "Raw".to_string();
         let image = App::render(&path).unwrap();
         let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
         let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
@@ -62,6 +64,7 @@ impl App {
             title,
             should_quit: false,
             path,
+            algorithm,
             image,
             show_image: ShowImage::Raw,
             // dithered_image,
@@ -87,7 +90,7 @@ impl App {
         Ok(image_static)
     }
 
-    /// Render resized
+    // Render resized
     pub fn render_resized(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let state = &mut self.image_scale_state;
         let block = block("Image");
@@ -95,10 +98,11 @@ impl App {
         f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
     }
 
-    /// Render Floyd Steinberg
+    // Render Floyd Steinberg
     pub fn render_floyd_steinberg(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
-        let path = &self.path;
-        let (mut buffer, width, height) = open_image(&PathBuf::from(path));
+        let block = block("Image");
+        let inner_area = block.inner(area);
+        let (mut buffer, width, height) = open_image(&PathBuf::from(&self.path));
         dither(
             &mut buffer,
             DitherMethod::FloydSteinberg,
@@ -114,8 +118,6 @@ impl App {
         let dithered_protocol: &mut StatefulProtocol =
             &mut self.picker.new_resize_protocol(dynamic.clone());
 
-        let block = block("Image");
-        let inner_area = block.inner(area);
         f.render_stateful_widget(
             StatefulImage::new().resize(resize),
             inner_area,
@@ -123,7 +125,7 @@ impl App {
         );
     }
 
-    /// Save the dithered image
+    // Save the dithered image
     pub fn save_dither(&mut self, image: DitherImage) {
         let DitherImage {
             buffer,
@@ -133,7 +135,7 @@ impl App {
         save_image(buffer, PathBuf::from("output.png"), width, height);
     }
 
-    /// Get file explorer showing only pictures and directories
+    // Get file explorer showing only pictures and directories
     pub fn get_explorer() -> Result<FileExplorer, Box<dyn Error>> {
         const SUPPORTED_FORMATS: [&str; 3] = ["jpg", "png", "JPG"];
         let theme = Theme::default().add_default_title();

@@ -43,9 +43,11 @@ where
                 break Ok(false);
             }
             if key.code == KeyCode::Char('d') {
+                app.algorithm = "Floyd Steinberg".to_string();
                 app.show_image = ShowImage::FloydSteinberg;
             }
             if key.code == KeyCode::Char('r') {
+                app.algorithm = "Raw".to_string();
                 app.show_image = ShowImage::Raw;
             }
         }
