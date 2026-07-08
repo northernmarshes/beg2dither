@@ -19,6 +19,7 @@ use std::path::PathBuf;
 pub enum ShowImage {
     Raw,
     FloydSteinberg,
+    Stucki,
 }
 
 pub struct DitherImage {
@@ -112,6 +113,32 @@ impl App {
         );
 
         // TODO: simplyfy this manipulation
+        let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
+            ImageBuffer::from_raw(width, height, buffer).unwrap();
+        let dynamic = DynamicImage::from(dithered);
+        let dithered_protocol: &mut StatefulProtocol =
+            &mut self.picker.new_resize_protocol(dynamic.clone());
+
+        f.render_stateful_widget(
+            StatefulImage::new().resize(resize),
+            inner_area,
+            dithered_protocol,
+        );
+    }
+
+    // Render Stucki
+    pub fn render_stucki(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
+        let block = block("Image");
+        let inner_area = block.inner(area);
+        let (mut buffer, width, height) = open_image(&PathBuf::from(&self.path));
+        dither(
+            &mut buffer,
+            DitherMethod::Stucki,
+            ColorPalette::Monochrome,
+            width,
+            height,
+        );
+
         let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
             ImageBuffer::from_raw(width, height, buffer).unwrap();
         let dynamic = DynamicImage::from(dithered);

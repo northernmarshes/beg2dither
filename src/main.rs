@@ -42,13 +42,17 @@ where
                 app.should_quit = true;
                 break Ok(false);
             }
-            if key.code == KeyCode::Char('d') {
+            if key.code == KeyCode::Char('1') {
+                app.algorithm = "Raw".to_string();
+                app.show_image = ShowImage::Raw;
+            }
+            if key.code == KeyCode::Char('2') {
                 app.algorithm = "Floyd Steinberg".to_string();
                 app.show_image = ShowImage::FloydSteinberg;
             }
-            if key.code == KeyCode::Char('r') {
-                app.algorithm = "Raw".to_string();
-                app.show_image = ShowImage::Raw;
+            if key.code == KeyCode::Char('3') {
+                app.algorithm = "Stucki".to_string();
+                app.show_image = ShowImage::Stucki;
             }
         }
         file_explorer.handle(&event)?;

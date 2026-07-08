@@ -82,11 +82,17 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     match app.show_image {
         ShowImage::Raw => app.render_resized(f, Resize::Scale(None), area),
         ShowImage::FloydSteinberg => app.render_floyd_steinberg(f, Resize::Scale(None), area),
+        ShowImage::Stucki => app.render_stucki(f, Resize::Scale(None), area),
     }
 
     // FOOTER
 
-    let current_keys_hint = { Span::styled("(q) to quit", Style::default().fg(Color::Red)) };
+    let current_keys_hint = {
+        Span::styled(
+            "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Exit (q)",
+            Style::default().fg(Color::Red),
+        )
+    };
     let placeholder_footer = Paragraph::new(Line::from(current_keys_hint))
         .alignment(Alignment::Center)
         .block(Block::default().borders(Borders::ALL));
