@@ -22,6 +22,11 @@ pub enum ShowImage {
     Stucki,
 }
 
+pub enum InputMode {
+    Normal,
+    Editing,
+}
+
 #[derive(Clone)]
 pub struct DitherImage {
     pub buffer: Vec<u8>,
@@ -35,6 +40,7 @@ pub struct App {
     pub path: String,
     pub algorithm: String,
     pub image: Protocol,
+    pub input_mode: InputMode,
     pub show_image: ShowImage,
     pub dithered_image: Option<DitherImage>,
     pub image_source: DynamicImage,
@@ -70,6 +76,7 @@ impl App {
             path,
             algorithm,
             image,
+            input_mode: InputMode::Normal,
             show_image: ShowImage::Raw,
             dithered_image,
             image_source,
@@ -79,7 +86,7 @@ impl App {
         }
     }
 
-    /// Render the image
+    // Render the image
     pub fn render(path: &String) -> Result<Protocol, ratatui_image::errors::Errors> {
         let image_source = image::ImageReader::open(path)?.decode()?;
 
@@ -108,6 +115,9 @@ impl App {
         let block = block("Image");
         let inner_area = block.inner(area);
         let (mut buffer, width, height) = open_image(&PathBuf::from(&self.path));
+
+        // TODO:: here we need to resize the image
+
         dither(
             &mut buffer,
             DitherMethod::FloydSteinberg,
@@ -135,6 +145,7 @@ impl App {
         );
     }
 
+    // TODO: the whole function is redundant, merge all to render_dither(algorithm)
     // Render Stucki
     pub fn render_stucki(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let block = block("Image");
@@ -196,7 +207,7 @@ impl App {
         Ok(file_explorer)
     }
 
-    /// Update path with files with image extension
+    // Update path with files with image extension
     pub fn update(&mut self, fe: &FileExplorer) {
         let image_extensions: [&str; 3] = ["jpg", "png", "JPG"];
         let img_path = &fe.current().path.display().to_string();

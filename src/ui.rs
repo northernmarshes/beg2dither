@@ -11,6 +11,7 @@ use ratatui_explorer::FileExplorer;
 use ratatui_image::Resize;
 
 use crate::app::App;
+use crate::app::InputMode;
 use crate::app::ShowImage;
 
 pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
@@ -63,12 +64,28 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
 
     // SIZE INPUT
 
-    let title_block = Block::default().borders(Borders::ALL).title("Output size");
-    let word = "400 x 300".to_string();
-    let title = Paragraph::new(Text::styled(word, Style::default().fg(Color::Green)))
-        .alignment(Alignment::Center)
-        .block(title_block);
+    let title_block = Block::default()
+        .borders(Borders::ALL)
+        .title("Edit output width (e)");
 
+    // TODO: this has to be dealt with differently
+    let mut input_placeholder: String;
+
+    match app.input_mode {
+        InputMode::Normal => {
+            input_placeholder = "Normal".to_string();
+        }
+        InputMode::Editing => {
+            input_placeholder = "Editing".to_string();
+        }
+    }
+
+    let title = Paragraph::new(Text::styled(
+        input_placeholder,
+        Style::default().fg(Color::Green),
+    ))
+    .alignment(Alignment::Center)
+    .block(title_block);
     f.render_widget(title, explorer_chunks[2]);
 
     // EXPLORER

@@ -1,4 +1,4 @@
-use crate::app::{App, ShowImage};
+use crate::app::{App, InputMode, ShowImage};
 use crate::ui::ui;
 use ratatui::crossterm::{
     ExecutableCommand,
@@ -44,6 +44,12 @@ where
             }
             if key.code == KeyCode::Char('s') {
                 app.save_dither(app.dithered_image.clone());
+            }
+            if key.code == KeyCode::Char('e') {
+                app.input_mode = InputMode::Editing;
+            }
+            if key.code == KeyCode::Esc {
+                app.input_mode = InputMode::Normal;
             }
             if key.code == KeyCode::Char('1') {
                 app.algorithm = "Raw".to_string();
