@@ -22,6 +22,7 @@ pub enum ShowImage {
     Stucki,
 }
 
+#[derive(Clone)]
 pub struct DitherImage {
     pub buffer: Vec<u8>,
     pub width: u32,
@@ -35,11 +36,11 @@ pub struct App {
     pub algorithm: String,
     pub image: Protocol,
     pub show_image: ShowImage,
-    // pub dithered_image: DitheredImage,
+    pub dithered_image: Option<DitherImage>,
     pub image_source: DynamicImage,
-
     pub picker: Picker,
     pub image_scale_state: StatefulProtocol,
+    pub output_size: (u32, u32),
 }
 
 fn size() -> Size {
@@ -53,6 +54,7 @@ impl App {
         let algorithm: String = "Raw".to_string();
         let image = App::render(&path).unwrap();
         let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
+        let dithered_image = None;
         let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
             terminal_background_color_osc: true,
             text_sizing_protocol: true,
@@ -61,6 +63,7 @@ impl App {
         .unwrap();
         // let dithered_image:
         let image_scale_state = picker.new_resize_protocol(image_source.clone());
+        let output_size = (500, 300);
         App {
             title,
             should_quit: false,
@@ -68,10 +71,11 @@ impl App {
             algorithm,
             image,
             show_image: ShowImage::Raw,
-            // dithered_image,
+            dithered_image,
             image_source,
             picker,
             image_scale_state,
+            output_size,
         }
     }
 
@@ -112,7 +116,12 @@ impl App {
             height,
         );
 
-        // TODO: simplyfy this manipulation
+        self.dithered_image = Some(DitherImage {
+            buffer: buffer.clone(),
+            width,
+            height,
+        });
+
         let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
             ImageBuffer::from_raw(width, height, buffer).unwrap();
         let dynamic = DynamicImage::from(dithered);
@@ -131,6 +140,7 @@ impl App {
         let block = block("Image");
         let inner_area = block.inner(area);
         let (mut buffer, width, height) = open_image(&PathBuf::from(&self.path));
+
         dither(
             &mut buffer,
             DitherMethod::Stucki,
@@ -138,6 +148,12 @@ impl App {
             width,
             height,
         );
+
+        self.dithered_image = Some(DitherImage {
+            buffer: buffer.clone(),
+            width,
+            height,
+        });
 
         let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
             ImageBuffer::from_raw(width, height, buffer).unwrap();
@@ -153,13 +169,13 @@ impl App {
     }
 
     // Save the dithered image
-    pub fn save_dither(&mut self, image: DitherImage) {
+    pub fn save_dither(&mut self, image: Option<DitherImage>) {
         let DitherImage {
             buffer,
             width,
             height,
-        } = image;
-        save_image(buffer, PathBuf::from("output.png"), width, height);
+        } = image.unwrap();
+        save_image(buffer.clone(), PathBuf::from("dithered.png"), width, height);
     }
 
     // Get file explorer showing only pictures and directories

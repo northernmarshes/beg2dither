@@ -89,7 +89,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
 
     let current_keys_hint = {
         Span::styled(
-            "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Exit (q)",
+            "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Save (s) | Exit (q)",
             Style::default().fg(Color::Red),
         )
     };

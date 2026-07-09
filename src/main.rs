@@ -42,6 +42,9 @@ where
                 app.should_quit = true;
                 break Ok(false);
             }
+            if key.code == KeyCode::Char('s') {
+                app.save_dither(app.dithered_image.clone());
+            }
             if key.code == KeyCode::Char('1') {
                 app.algorithm = "Raw".to_string();
                 app.show_image = ShowImage::Raw;
