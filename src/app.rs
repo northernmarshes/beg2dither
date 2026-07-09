@@ -3,6 +3,9 @@ use dithers::palette::ColorPalette;
 use image::DynamicImage;
 use image::ImageBuffer;
 use image::Rgb;
+// use image::codecs::png::FilterType;
+use image::imageops::FilterType;
+use image::imageops::resize;
 use ratatui::Frame;
 use ratatui::layout::{Rect, Size};
 use ratatui::widgets::{Block, Borders};
@@ -110,6 +113,15 @@ impl App {
         f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
     }
 
+    // TODO:: change the output of this function to fit before dithering
+    // Resize te preview to have nice display
+    pub fn resize_preview(&mut self, image: DynamicImage, width: u32) -> DynamicImage {
+        let filter = FilterType::Nearest;
+        let height = width * image.height() / image.width();
+        let scaled = resize(&image, width, height, filter);
+        DynamicImage::from(scaled)
+    }
+
     // Render Floyd Steinberg
     pub fn render_floyd_steinberg(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let block = block("Image");
@@ -134,7 +146,8 @@ impl App {
 
         let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
             ImageBuffer::from_raw(width, height, buffer).unwrap();
-        let dynamic = DynamicImage::from(dithered);
+        let mut dynamic = DynamicImage::from(dithered);
+        dynamic = self.resize_preview(dynamic, 500);
         let dithered_protocol: &mut StatefulProtocol =
             &mut self.picker.new_resize_protocol(dynamic.clone());
 
