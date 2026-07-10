@@ -35,9 +35,9 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Length(3),
-            Constraint::Length(30),
-            Constraint::Length(9),
+            Constraint::Length(37),
             Constraint::Length(3),
+            Constraint::Length(10),
         ])
         .split(main_chunks[0]);
 
@@ -76,7 +76,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     ))
     .alignment(Alignment::Center)
     .block(title_block);
-    f.render_widget(title, explorer_chunks[3]);
+    f.render_widget(title, explorer_chunks[2]);
 
     // EXPLORER
     f.render_widget_ref(fe.widget(), explorer_chunks[1]);
@@ -88,7 +88,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         .alignment(Alignment::Center)
         .block(title_block);
 
-    f.render_widget(title, explorer_chunks[2]);
+    f.render_widget(title, explorer_chunks[3]);
 
     // PREVIEW
     let block = Block::default().borders(Borders::ALL).title("Image");

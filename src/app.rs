@@ -1,11 +1,9 @@
-use dithers::dither::{DitherMethod, dither, open_image, save_image};
+use dithers::dither::{DitherMethod, dither, save_image};
 use dithers::palette::ColorPalette;
+use image::DynamicImage;
 use image::ImageBuffer;
 use image::Rgb;
-use image::{DynamicImage, buffer};
-// use image::codecs::png::FilterType;
 use image::imageops::FilterType;
-use image::imageops::resize;
 use ratatui::Frame;
 use ratatui::layout::{Rect, Size};
 use ratatui::widgets::{Block, Borders};
@@ -113,7 +111,6 @@ impl App {
         f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
     }
 
-    // TODO:: change the output of this function to fit before dithering
     // Resize te preview to have nice display
     pub fn get_resized(
         &self,
@@ -122,10 +119,9 @@ impl App {
     ) -> Result<DitherImage, ratatui_image::errors::Errors> {
         let image = image::ImageReader::open(path)?.decode()?;
         let filter = FilterType::Nearest;
-        let height = 300;
-        // let height: u32 = width * image.height() / image.width();
-        let buffer = resize(&image, width, height, filter).as_raw().clone();
-        // let buffer: Vec<u8> =; // something
+        let height: u32 = width * image.height() / image.width();
+        let scaled = image.resize(width, height, filter);
+        let buffer: Vec<u8> = scaled.into_rgb8().into_raw();
         Ok(DitherImage {
             buffer,
             width,
@@ -176,7 +172,12 @@ impl App {
     pub fn render_stucki(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let block = block("Image");
         let inner_area = block.inner(area);
-        let (mut buffer, width, height) = open_image(&PathBuf::from(&self.path));
+
+        let DitherImage {
+            mut buffer,
+            width,
+            height,
+        } = self.get_resized(&self.path, 300).unwrap();
 
         dither(
             &mut buffer,
