@@ -295,14 +295,8 @@ impl App {
         new_cursor_pos.clamp(0, self.input.chars().count())
     }
 
-    // const fn reset_cursor(&mut self) {
-    //     self.character_index = 0;
-    // }
-
     pub fn submit_message(&mut self) {
         self.output_width = self.input.parse().unwrap_or(300);
-        // self.input.clear();
-        // self.reset_cursor();
         self.input_mode = InputMode::Normal;
     }
 }
