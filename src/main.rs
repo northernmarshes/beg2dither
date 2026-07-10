@@ -80,7 +80,10 @@ where
                 InputMode::Editing => {}
             }
         }
-        file_explorer.handle(&event)?;
+        match app.input_mode {
+            InputMode::Normal => file_explorer.handle(&event)?,
+            InputMode::Editing => {}
+        }
         app.update(&file_explorer);
     }
 }

@@ -61,7 +61,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
 
     // SIZE INPUT
 
-    let input = Paragraph::new(app.output_width.to_string())
+    let input = Paragraph::new(app.input.to_string())
         .style(match app.input_mode {
             InputMode::Normal => Style::default(),
             InputMode::Editing => Style::default().fg(Color::Yellow),
