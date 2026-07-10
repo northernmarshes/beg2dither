@@ -36,7 +36,6 @@ pub struct DitherImage {
 }
 
 pub struct App {
-    pub title: String,
     pub should_quit: bool,
     pub path: String,
     pub algorithm: String,
@@ -47,7 +46,9 @@ pub struct App {
     pub image_source: DynamicImage,
     pub picker: Picker,
     pub image_scale_state: StatefulProtocol,
-    pub output_size: (u32, u32),
+    pub output_width: u32,
+    pub input: String,
+    pub character_index: usize,
 }
 
 fn size() -> Size {
@@ -56,7 +57,6 @@ fn size() -> Size {
 
 impl App {
     pub fn new() -> App {
-        let title = "RATADOT".to_string();
         let path: String = "./assets/dc01.JPG".to_string();
         let algorithm: String = "Raw".to_string();
         let image = App::render(&path).unwrap();
@@ -70,9 +70,9 @@ impl App {
         .unwrap();
         // let dithered_image:
         let image_scale_state = picker.new_resize_protocol(image_source.clone());
-        let output_size = (500, 300);
+        let output_width: u32 = 300;
+        let input = output_width.to_string();
         App {
-            title,
             should_quit: false,
             path,
             algorithm,
@@ -83,7 +83,9 @@ impl App {
             image_source,
             picker,
             image_scale_state,
-            output_size,
+            input,
+            output_width,
+            character_index: 3,
         }
     }
 
@@ -138,7 +140,7 @@ impl App {
             mut buffer,
             width,
             height,
-        } = self.get_resized(&self.path, 300).unwrap();
+        } = self.get_resized(&self.path, self.output_width).unwrap();
 
         dither(
             &mut buffer,
@@ -168,6 +170,7 @@ impl App {
     }
 
     // TODO: the whole function is redundant, merge all to render_dither(algorithm)
+
     // Render Stucki
     pub fn render_stucki(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let block = block("Image");
@@ -177,7 +180,7 @@ impl App {
             mut buffer,
             width,
             height,
-        } = self.get_resized(&self.path, 300).unwrap();
+        } = self.get_resized(&self.path, self.output_width).unwrap();
 
         dither(
             &mut buffer,
@@ -250,6 +253,56 @@ impl App {
                 .unwrap();
             self.image_scale_state = self.picker.new_resize_protocol(self.image_source.clone());
         }
+    }
+
+    // Input section
+    pub fn move_cursor_left(&mut self) {
+        let cursor_moved_left = self.character_index.saturating_sub(1);
+        self.character_index = self.clamp_cursor(cursor_moved_left);
+    }
+
+    pub fn move_cursor_right(&mut self) {
+        let cursor_moved_right = self.character_index.saturating_add(1);
+        self.character_index = self.clamp_cursor(cursor_moved_right);
+    }
+
+    pub fn enter_char(&mut self, new_char: char) {
+        let index = self.byte_index();
+        self.input.insert(index, new_char);
+        self.move_cursor_right();
+    }
+    pub fn byte_index(&self) -> usize {
+        self.input
+            .char_indices()
+            .map(|(i, _)| i)
+            .nth(self.character_index)
+            .unwrap_or(self.input.len())
+    }
+
+    pub fn delete_char(&mut self) {
+        let is_not_cursor_leftmost = self.character_index != 0;
+        if is_not_cursor_leftmost {
+            let current_index = self.character_index;
+            let from_left_to_current_index = current_index - 1;
+            let before_char_to_delete = self.input.chars().take(from_left_to_current_index);
+            let after_char_to_delete = self.input.chars().skip(current_index);
+            self.input = before_char_to_delete.chain(after_char_to_delete).collect();
+            self.move_cursor_left();
+        }
+    }
+
+    pub fn clamp_cursor(&self, new_cursor_pos: usize) -> usize {
+        new_cursor_pos.clamp(0, self.input.chars().count())
+    }
+
+    const fn reset_cursor(&mut self) {
+        self.character_index = 0;
+    }
+
+    pub fn submit_message(&mut self) {
+        // self.messages.push(self.input.clone());
+        self.input.clear();
+        self.reset_cursor();
     }
 }
 

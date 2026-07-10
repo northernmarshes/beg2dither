@@ -3,6 +3,7 @@ use ratatui::layout::Alignment;
 use ratatui::layout::Constraint;
 use ratatui::layout::Direction;
 use ratatui::layout::Layout;
+use ratatui::layout::Position;
 use ratatui::style::{Color, Style};
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::FrameExt as _;
@@ -58,25 +59,23 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         .borders(Borders::ALL)
         .title("Edit output width (e)");
 
-    // TODO: this has to be dealt with differently
-    let mut input_placeholder: String;
+    // SIZE INPUT
 
+    let input = Paragraph::new(app.output_width.to_string())
+        .style(match app.input_mode {
+            InputMode::Normal => Style::default(),
+            InputMode::Editing => Style::default().fg(Color::Yellow),
+        })
+        .block(Block::bordered().title("output width"));
+    f.render_widget(input, explorer_chunks[2]);
     match app.input_mode {
-        InputMode::Normal => {
-            input_placeholder = "Normal".to_string();
-        }
-        InputMode::Editing => {
-            input_placeholder = "Editing".to_string();
-        }
+        InputMode::Normal => {}
+        #[expect(clippy::cast_possible_truncation)]
+        InputMode::Editing => f.set_cursor_position(Position::new(
+            explorer_chunks[2].x + app.character_index as u16 + 1,
+            explorer_chunks[2].y + 1,
+        )),
     }
-
-    let title = Paragraph::new(Text::styled(
-        input_placeholder,
-        Style::default().fg(Color::Green),
-    ))
-    .alignment(Alignment::Center)
-    .block(title_block);
-    f.render_widget(title, explorer_chunks[2]);
 
     // EXPLORER
     f.render_widget_ref(fe.widget(), explorer_chunks[1]);
@@ -102,7 +101,6 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     }
 
     // FOOTER
-
     let current_keys_hint = {
         Span::styled(
             "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Save (s) | Exit (q)",

@@ -1,5 +1,6 @@
 use crate::app::{App, InputMode, ShowImage};
 use crate::ui::ui;
+use crossterm::event::KeyEventKind;
 use ratatui::crossterm::{
     ExecutableCommand,
     event::{Event, KeyCode, read},
@@ -38,30 +39,45 @@ where
 
         let event = read()?;
         if let Event::Key(key) = event {
-            if key.code == KeyCode::Char('q') {
-                app.should_quit = true;
-                break Ok(false);
-            }
-            if key.code == KeyCode::Char('s') {
-                app.save_dither(app.dithered_image.clone());
-            }
-            if key.code == KeyCode::Char('e') {
-                app.input_mode = InputMode::Editing;
-            }
-            if key.code == KeyCode::Esc {
-                app.input_mode = InputMode::Normal;
-            }
-            if key.code == KeyCode::Char('1') {
-                app.algorithm = "Raw".to_string();
-                app.show_image = ShowImage::Raw;
-            }
-            if key.code == KeyCode::Char('2') {
-                app.algorithm = "Floyd Steinberg".to_string();
-                app.show_image = ShowImage::FloydSteinberg;
-            }
-            if key.code == KeyCode::Char('3') {
-                app.algorithm = "Stucki".to_string();
-                app.show_image = ShowImage::Stucki;
+            match app.input_mode {
+                InputMode::Normal => match key.code {
+                    KeyCode::Char('q') => {
+                        app.should_quit = true;
+                        break Ok(false);
+                    }
+                    KeyCode::Char('s') => {
+                        app.save_dither(app.dithered_image.clone());
+                    }
+                    KeyCode::Char('e') => {
+                        app.input_mode = InputMode::Editing;
+                    }
+                    KeyCode::Esc => {
+                        app.input_mode = InputMode::Normal;
+                    }
+                    KeyCode::Char('1') => {
+                        app.algorithm = "Raw".to_string();
+                        app.show_image = ShowImage::Raw;
+                    }
+                    KeyCode::Char('2') => {
+                        app.algorithm = "Floyd Steinberg".to_string();
+                        app.show_image = ShowImage::FloydSteinberg;
+                    }
+                    KeyCode::Char('3') => {
+                        app.algorithm = "Stucki".to_string();
+                        app.show_image = ShowImage::Stucki;
+                    }
+                    _ => {}
+                },
+                InputMode::Editing if key.kind == KeyEventKind::Press => match key.code {
+                    KeyCode::Enter => app.submit_message(),
+                    KeyCode::Char(to_insert) => app.enter_char(to_insert),
+                    KeyCode::Backspace => app.delete_char(),
+                    KeyCode::Left => app.move_cursor_left(),
+                    KeyCode::Right => app.move_cursor_right(),
+                    KeyCode::Esc => app.input_mode = InputMode::Normal,
+                    _ => {}
+                },
+                InputMode::Editing => {}
             }
         }
         file_explorer.handle(&event)?;
