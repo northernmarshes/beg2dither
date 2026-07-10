@@ -1,8 +1,8 @@
 use dithers::dither::{DitherMethod, dither, open_image, save_image};
 use dithers::palette::ColorPalette;
-use image::DynamicImage;
 use image::ImageBuffer;
 use image::Rgb;
+use image::{DynamicImage, buffer};
 // use image::codecs::png::FilterType;
 use image::imageops::FilterType;
 use image::imageops::resize;
@@ -115,20 +115,34 @@ impl App {
 
     // TODO:: change the output of this function to fit before dithering
     // Resize te preview to have nice display
-    pub fn resize_preview(&mut self, image: DynamicImage, width: u32) -> DynamicImage {
+    pub fn get_resized(
+        &self,
+        path: &str,
+        width: u32,
+    ) -> Result<DitherImage, ratatui_image::errors::Errors> {
+        let image = image::ImageReader::open(path)?.decode()?;
         let filter = FilterType::Nearest;
-        let height = width * image.height() / image.width();
-        let scaled = resize(&image, width, height, filter);
-        DynamicImage::from(scaled)
+        let height = 300;
+        // let height: u32 = width * image.height() / image.width();
+        let buffer = resize(&image, width, height, filter).as_raw().clone();
+        // let buffer: Vec<u8> =; // something
+        Ok(DitherImage {
+            buffer,
+            width,
+            height,
+        })
     }
 
     // Render Floyd Steinberg
     pub fn render_floyd_steinberg(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let block = block("Image");
         let inner_area = block.inner(area);
-        let (mut buffer, width, height) = open_image(&PathBuf::from(&self.path));
 
-        // TODO:: here we need to resize the image
+        let DitherImage {
+            mut buffer,
+            width,
+            height,
+        } = self.get_resized(&self.path, 300).unwrap();
 
         dither(
             &mut buffer,
@@ -146,8 +160,7 @@ impl App {
 
         let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
             ImageBuffer::from_raw(width, height, buffer).unwrap();
-        let mut dynamic = DynamicImage::from(dithered);
-        dynamic = self.resize_preview(dynamic, 500);
+        let dynamic = DynamicImage::from(dithered);
         let dithered_protocol: &mut StatefulProtocol =
             &mut self.picker.new_resize_protocol(dynamic.clone());
 

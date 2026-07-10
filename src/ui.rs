@@ -15,38 +15,28 @@ use crate::app::InputMode;
 use crate::app::ShowImage;
 
 pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
-    // VERTICSL CHUNKS
+    // VERTICAL CHUNKS
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length(3),
-            Constraint::Length(30),
+            // Constraint::Length(3),
+            Constraint::Length(50),
             Constraint::Length(3),
         ])
         .split(f.area());
 
-    // TITLE
-    let title_block = Block::default()
-        .borders(Borders::ALL)
-        .style(Style::default());
-    let word = &app.title;
-    let title = Paragraph::new(Text::styled(word, Style::default().fg(Color::Green)))
-        .alignment(Alignment::Center)
-        .block(title_block);
-
-    f.render_widget(title, chunks[0]);
-
     // MAIN CHUNKS
     let main_chunks = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(30), Constraint::Percentage(70)])
-        .split(chunks[1]);
+        .constraints([Constraint::Percentage(25), Constraint::Percentage(75)])
+        .split(chunks[0]);
 
     let explorer_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Length(3),
             Constraint::Length(30),
+            Constraint::Length(9),
             Constraint::Length(3),
         ])
         .split(main_chunks[0]);
@@ -86,10 +76,19 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     ))
     .alignment(Alignment::Center)
     .block(title_block);
-    f.render_widget(title, explorer_chunks[2]);
+    f.render_widget(title, explorer_chunks[3]);
 
     // EXPLORER
     f.render_widget_ref(fe.widget(), explorer_chunks[1]);
+
+    // HISTOGRAM
+    let title_block = Block::default().borders(Borders::ALL).title("Histogram");
+    let word = "stats".to_string();
+    let title = Paragraph::new(Text::styled(word, Style::default().fg(Color::Green)))
+        .alignment(Alignment::Center)
+        .block(title_block);
+
+    f.render_widget(title, explorer_chunks[2]);
 
     // PREVIEW
     let block = Block::default().borders(Borders::ALL).title("Image");
@@ -116,7 +115,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     let footer_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(100)])
-        .split(chunks[2]);
+        .split(chunks[1]);
 
     f.render_widget(placeholder_footer, footer_chunks[0]);
 }
