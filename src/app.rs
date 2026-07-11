@@ -5,13 +5,13 @@ use image::ImageBuffer;
 use image::Rgb;
 use image::imageops::FilterType;
 use ratatui::Frame;
-use ratatui::layout::{Rect, Size};
+use ratatui::layout::Rect;
 use ratatui::widgets::{Block, Borders};
 use ratatui_explorer::{FileExplorer, FileExplorerBuilder, Theme};
 use ratatui_image::StatefulImage;
 use ratatui_image::picker::cap_parser::QueryStdioOptions;
 use ratatui_image::protocol::StatefulProtocol;
-use ratatui_image::{Resize, picker::Picker, protocol::Protocol};
+use ratatui_image::{Resize, picker::Picker};
 use std::error::Error;
 use std::ffi::OsStr;
 use std::path::Path;
@@ -39,7 +39,6 @@ pub struct App {
     pub should_quit: bool,
     pub path: String,
     pub algorithm: String,
-    pub image: Protocol,
     pub input_mode: InputMode,
     pub show_image: ShowImage,
     pub dithered_image: Option<DitherImage>,
@@ -52,15 +51,10 @@ pub struct App {
     pub character_index: usize,
 }
 
-fn size() -> Size {
-    Size::new(30, 16)
-}
-
 impl App {
     pub fn new() -> App {
         let path: String = "./assets/dc01.JPG".to_string();
         let algorithm: String = "Raw".to_string();
-        let image = App::render(&path).unwrap();
         let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
         let dithered_image = None;
         let snackbar: String = "".to_string();
@@ -78,7 +72,6 @@ impl App {
             should_quit: false,
             path,
             algorithm,
-            image,
             input_mode: InputMode::Normal,
             show_image: ShowImage::Raw,
             snackbar,
@@ -90,22 +83,6 @@ impl App {
             output_width,
             character_index: 3,
         }
-    }
-
-    // Render the image
-    pub fn render(path: &String) -> Result<Protocol, ratatui_image::errors::Errors> {
-        let image_source = image::ImageReader::open(path)?.decode()?;
-
-        let picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
-            terminal_background_color_osc: true,
-            text_sizing_protocol: true,
-            ..Default::default()
-        })?;
-
-        let image_static = picker
-            .new_protocol(image_source.clone(), size(), Resize::Fit(None))
-            .expect("demo gets a protocol from image");
-        Ok(image_static)
     }
 
     // Render resized

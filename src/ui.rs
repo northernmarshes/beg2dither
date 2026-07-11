@@ -56,18 +56,12 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
 
     // SIZE INPUT
 
-    let title_block = Block::default()
-        .borders(Borders::ALL)
-        .title("Edit output width (e)");
-
-    // SIZE INPUT
-
     let input = Paragraph::new(app.input.to_string())
         .style(match app.input_mode {
             InputMode::Normal => Style::default(),
             InputMode::Editing => Style::default().fg(Color::Yellow),
         })
-        .block(Block::bordered().title("output width"));
+        .block(Block::bordered().title("Output width (e)/esc"));
     f.render_widget(input, explorer_chunks[2]);
     match app.input_mode {
         InputMode::Normal => {}
