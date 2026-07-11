@@ -44,6 +44,7 @@ pub struct App {
     pub show_image: ShowImage,
     pub dithered_image: Option<DitherImage>,
     pub image_source: DynamicImage,
+    pub snackbar: String,
     pub picker: Picker,
     pub image_scale_state: StatefulProtocol,
     pub output_width: u32,
@@ -62,6 +63,7 @@ impl App {
         let image = App::render(&path).unwrap();
         let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
         let dithered_image = None;
+        let snackbar: String = "".to_string();
         let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
             terminal_background_color_osc: true,
             text_sizing_protocol: true,
@@ -79,6 +81,7 @@ impl App {
             image,
             input_mode: InputMode::Normal,
             show_image: ShowImage::Raw,
+            snackbar,
             dithered_image,
             image_source,
             picker,
@@ -295,8 +298,17 @@ impl App {
         new_cursor_pos.clamp(0, self.input.chars().count())
     }
 
+    fn is_valid(&self) -> bool {
+        self.input.bytes().all(|c| c.is_ascii_digit())
+    }
+
     pub fn submit_message(&mut self) {
-        self.output_width = self.input.parse().unwrap_or(300);
+        let isvalid = self.is_valid();
+        if isvalid {
+            self.output_width = self.input.parse().unwrap_or(300);
+        } else {
+            self.snackbar = "Value has to be a number".to_string();
+        };
         self.input_mode = InputMode::Normal;
     }
 }

@@ -23,6 +23,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
             // Constraint::Length(3),
             Constraint::Length(50),
             Constraint::Length(3),
+            Constraint::Length(3),
         ])
         .split(f.area());
 
@@ -100,6 +101,14 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         ShowImage::Stucki => app.render_stucki(f, Resize::Scale(None), area),
     }
 
+    // POP UP
+    let snackbar = { Span::styled(app.snackbar.to_string(), Style::default().fg(Color::Blue)) };
+    let snackbar_paragraph = Paragraph::new(Line::from(snackbar))
+        .alignment(Alignment::Center)
+        .block(Block::default().borders(Borders::ALL));
+
+    f.render_widget(snackbar_paragraph, chunks[1]);
+
     // FOOTER
     let current_keys_hint = {
         Span::styled(
@@ -113,7 +122,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     let footer_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(100)])
-        .split(chunks[1]);
+        .split(chunks[2]);
 
     f.render_widget(placeholder_footer, footer_chunks[0]);
 }
