@@ -95,8 +95,8 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         ShowImage::Stucki => app.render_stucki(f, Resize::Scale(None), area),
     }
 
-    // POP UP
-    let snackbar = { Span::styled(app.snackbar.to_string(), Style::default().fg(Color::Blue)) };
+    // SNACKBAR
+    let snackbar = { Span::styled(app.snackbar.to_string(), Style::default().fg(Color::Red)) };
     let snackbar_paragraph = Paragraph::new(Line::from(snackbar))
         .alignment(Alignment::Center)
         .block(Block::default().borders(Borders::ALL));
@@ -107,7 +107,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     let current_keys_hint = {
         Span::styled(
             "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Save (s) | Exit (q)",
-            Style::default().fg(Color::Red),
+            Style::default().fg(Color::Blue),
         )
     };
     let placeholder_footer = Paragraph::new(Line::from(current_keys_hint))

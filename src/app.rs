@@ -9,6 +9,7 @@ use ratatui::layout::Rect;
 use ratatui::widgets::{Block, Borders};
 use ratatui_explorer::{FileExplorer, FileExplorerBuilder, Theme};
 use ratatui_image::StatefulImage;
+use ratatui_image::errors::Errors;
 use ratatui_image::picker::cap_parser::QueryStdioOptions;
 use ratatui_image::protocol::StatefulProtocol;
 use ratatui_image::{Resize, picker::Picker};
@@ -29,7 +30,7 @@ pub enum InputMode {
 }
 
 #[derive(Clone)]
-pub struct DitherImage {
+pub struct RawImage {
     pub buffer: Vec<u8>,
     pub width: u32,
     pub height: u32,
@@ -41,7 +42,7 @@ pub struct App {
     pub algorithm: String,
     pub input_mode: InputMode,
     pub show_image: ShowImage,
-    pub dithered_image: Option<DitherImage>,
+    pub dithered_image: Option<RawImage>,
     pub image_source: DynamicImage,
     pub snackbar: String,
     pub picker: Picker,
@@ -98,13 +99,33 @@ impl App {
         &self,
         path: &str,
         width: u32,
-    ) -> Result<DitherImage, ratatui_image::errors::Errors> {
+    ) -> Result<RawImage, ratatui_image::errors::Errors> {
         let image = image::ImageReader::open(path)?.decode()?;
         let filter = FilterType::Nearest;
         let height: u32 = width * image.height() / image.width();
         let scaled = image.resize(width, height, filter);
         let buffer: Vec<u8> = scaled.into_rgb8().into_raw();
-        Ok(DitherImage {
+        Ok(RawImage {
+            buffer,
+            width,
+            height,
+        })
+    }
+
+    pub fn dither_it(
+        &mut self,
+        mut buffer: Vec<u8>,
+        width: u32,
+        height: u32,
+    ) -> Result<RawImage, Errors> {
+        dither(
+            &mut buffer,
+            DitherMethod::FloydSteinberg,
+            ColorPalette::Monochrome,
+            width,
+            height,
+        );
+        Ok(RawImage {
             buffer,
             width,
             height,
@@ -116,21 +137,19 @@ impl App {
         let block = block("Image");
         let inner_area = block.inner(area);
 
-        let DitherImage {
-            mut buffer,
+        let RawImage {
+            buffer,
             width,
             height,
         } = self.get_resized(&self.path, self.output_width).unwrap();
 
-        dither(
-            &mut buffer,
-            DitherMethod::FloydSteinberg,
-            ColorPalette::Monochrome,
+        let RawImage {
+            buffer,
             width,
             height,
-        );
+        } = self.dither_it(buffer.clone(), width, height).unwrap();
 
-        self.dithered_image = Some(DitherImage {
+        self.dithered_image = Some(RawImage {
             buffer: buffer.clone(),
             width,
             height,
@@ -156,7 +175,7 @@ impl App {
         let block = block("Image");
         let inner_area = block.inner(area);
 
-        let DitherImage {
+        let RawImage {
             mut buffer,
             width,
             height,
@@ -170,7 +189,7 @@ impl App {
             height,
         );
 
-        self.dithered_image = Some(DitherImage {
+        self.dithered_image = Some(RawImage {
             buffer: buffer.clone(),
             width,
             height,
@@ -190,8 +209,8 @@ impl App {
     }
 
     // Save the dithered image
-    pub fn save_dither(&mut self, image: Option<DitherImage>) {
-        let DitherImage {
+    pub fn save_dither(&mut self, image: Option<RawImage>) {
+        let RawImage {
             buffer,
             width,
             height,
@@ -282,9 +301,14 @@ impl App {
     pub fn submit_message(&mut self) {
         let isvalid = self.is_valid();
         if isvalid {
-            self.output_width = self.input.parse().unwrap_or(300);
+            let input = self.input.parse().unwrap_or(300);
+            if input > 30 && input < 9000 {
+                self.output_width = self.input.parse().unwrap_or(300);
+            } else {
+                self.snackbar = "The value has to be between 30 and 9000!".to_string();
+            }
         } else {
-            self.snackbar = "Value has to be a number".to_string();
+            self.snackbar = "The value has to be a number!".to_string();
         };
         self.input_mode = InputMode::Normal;
     }
