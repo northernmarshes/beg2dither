@@ -39,25 +39,25 @@ pub struct RawImage {
 }
 
 pub struct App {
-    pub should_quit: bool,
     pub path: String,
-    pub algorithm: String,
     pub input_mode: InputMode,
     pub show_image: ShowImage,
     pub dithered_image: Option<RawImage>,
     pub image_source: DynamicImage,
-    pub snackbar: String,
     pub picker: Picker,
     pub image_scale_state: StatefulProtocol,
     pub output_width: u32,
     pub input: String,
     pub character_index: usize,
+    pub should_quit: bool,
+    pub algorithm_bar: String,
+    pub snackbar: String,
 }
 
 impl App {
     pub fn new() -> App {
         let path: String = "./assets/dc01.JPG".to_string();
-        let algorithm: String = "Raw".to_string();
+        let algorithm_bar: String = "Raw".to_string();
         let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
         let dithered_image = None;
         let snackbar: String = "".to_string();
@@ -72,9 +72,8 @@ impl App {
         let output_width: u32 = 300;
         let input = output_width.to_string();
         App {
-            should_quit: false,
             path,
-            algorithm,
+            algorithm_bar,
             input_mode: InputMode::Normal,
             show_image: ShowImage::Raw,
             snackbar,
@@ -85,15 +84,8 @@ impl App {
             input,
             output_width,
             character_index: 3,
+            should_quit: false,
         }
-    }
-
-    // Render resized
-    pub fn render_resized(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
-        let state = &mut self.image_scale_state;
-        let block = block("Image");
-        let inner_area = block.inner(area);
-        f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
     }
 
     // Resize te preview to have nice display
@@ -105,8 +97,8 @@ impl App {
         let image = image::ImageReader::open(path)?.decode()?;
         let filter = FilterType::Nearest;
         let height: u32 = width * image.height() / image.width();
-        let scaled = image.resize(width, height, filter);
-        let buffer: Vec<u8> = scaled.into_rgb8().into_raw();
+        let scaled = image.resize_exact(width, height, filter);
+        let buffer: Vec<u8> = scaled.to_rgb8().into_raw();
         Ok(RawImage {
             buffer,
             width,
@@ -142,7 +134,15 @@ impl App {
         })
     }
 
-    // Render Floyd Steinberg
+    // Render RAW resized
+    pub fn render_resized(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
+        let state = &mut self.image_scale_state;
+        let block = block("Image");
+        let inner_area = block.inner(area);
+        f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
+    }
+
+    // Render DITHERED resized
     pub fn render_dithered(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let block = block("Image");
         let inner_area = block.inner(area);
@@ -157,7 +157,7 @@ impl App {
             buffer,
             width,
             height,
-        } = self.dither_it(buffer.clone(), width, height).unwrap();
+        } = self.dither_it(buffer, width, height).unwrap();
 
         self.dithered_image = Some(RawImage {
             buffer: buffer.clone(),

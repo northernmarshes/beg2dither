@@ -55,23 +55,23 @@ where
                         app.input_mode = InputMode::Normal;
                     }
                     KeyCode::Char('1') => {
-                        app.algorithm = "Raw".to_string();
+                        app.algorithm_bar = "Raw".to_string();
                         app.show_image = ShowImage::Raw;
                     }
                     KeyCode::Char('2') => {
-                        app.algorithm = "Floyd Steinberg".to_string();
+                        app.algorithm_bar = "Floyd Steinberg".to_string();
                         app.show_image = ShowImage::FloydSteinberg;
                     }
                     KeyCode::Char('3') => {
-                        app.algorithm = "Stucki".to_string();
+                        app.algorithm_bar = "Stucki".to_string();
                         app.show_image = ShowImage::Stucki;
                     }
                     KeyCode::Char('4') => {
-                        app.algorithm = "Jarvis".to_string();
+                        app.algorithm_bar = "Jarvis".to_string();
                         app.show_image = ShowImage::Jarvis;
                     }
                     KeyCode::Char('5') => {
-                        app.algorithm = "Atkinson".to_string();
+                        app.algorithm_bar = "Atkinson".to_string();
                         app.show_image = ShowImage::Atkinson;
                     }
                     _ => {}

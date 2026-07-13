@@ -47,7 +47,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     let title_block = Block::default()
         .borders(Borders::ALL)
         .title("Current Algorithm");
-    let word = app.algorithm.to_string();
+    let word = app.algorithm_bar.to_string();
     let title = Paragraph::new(Text::styled(word, Style::default().fg(Color::Green)))
         .alignment(Alignment::Center)
         .block(title_block);
