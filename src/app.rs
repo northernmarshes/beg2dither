@@ -22,6 +22,8 @@ pub enum ShowImage {
     Raw,
     FloydSteinberg,
     Stucki,
+    Jarvis,
+    Atkinson,
 }
 
 pub enum InputMode {
@@ -118,9 +120,17 @@ impl App {
         width: u32,
         height: u32,
     ) -> Result<RawImage, Errors> {
+        let dither_type = match self.show_image {
+            ShowImage::Raw => DitherMethod::FloydSteinberg,
+            ShowImage::FloydSteinberg => DitherMethod::FloydSteinberg,
+            ShowImage::Stucki => DitherMethod::Stucki,
+            ShowImage::Jarvis => DitherMethod::Jarvis,
+            ShowImage::Atkinson => DitherMethod::Atkinson,
+        };
+
         dither(
             &mut buffer,
-            DitherMethod::FloydSteinberg,
+            dither_type,
             ColorPalette::Monochrome,
             width,
             height,
@@ -133,7 +143,7 @@ impl App {
     }
 
     // Render Floyd Steinberg
-    pub fn render_floyd_steinberg(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
+    pub fn render_dithered(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let block = block("Image");
         let inner_area = block.inner(area);
 
@@ -148,46 +158,6 @@ impl App {
             width,
             height,
         } = self.dither_it(buffer.clone(), width, height).unwrap();
-
-        self.dithered_image = Some(RawImage {
-            buffer: buffer.clone(),
-            width,
-            height,
-        });
-
-        let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
-            ImageBuffer::from_raw(width, height, buffer).unwrap();
-        let dynamic = DynamicImage::from(dithered);
-        let dithered_protocol: &mut StatefulProtocol =
-            &mut self.picker.new_resize_protocol(dynamic.clone());
-
-        f.render_stateful_widget(
-            StatefulImage::new().resize(resize),
-            inner_area,
-            dithered_protocol,
-        );
-    }
-
-    // TODO: the whole function is redundant, merge all to render_dither(algorithm)
-
-    // Render Stucki
-    pub fn render_stucki(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
-        let block = block("Image");
-        let inner_area = block.inner(area);
-
-        let RawImage {
-            mut buffer,
-            width,
-            height,
-        } = self.get_resized(&self.path, self.output_width).unwrap();
-
-        dither(
-            &mut buffer,
-            DitherMethod::Stucki,
-            ColorPalette::Monochrome,
-            width,
-            height,
-        );
 
         self.dithered_image = Some(RawImage {
             buffer: buffer.clone(),

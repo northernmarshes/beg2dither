@@ -66,6 +66,14 @@ where
                         app.algorithm = "Stucki".to_string();
                         app.show_image = ShowImage::Stucki;
                     }
+                    KeyCode::Char('4') => {
+                        app.algorithm = "Jarvis".to_string();
+                        app.show_image = ShowImage::Jarvis;
+                    }
+                    KeyCode::Char('5') => {
+                        app.algorithm = "Atkinson".to_string();
+                        app.show_image = ShowImage::Atkinson;
+                    }
                     _ => {}
                 },
                 InputMode::Editing if key.kind == KeyEventKind::Press => match key.code {

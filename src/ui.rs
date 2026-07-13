@@ -91,8 +91,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
 
     match app.show_image {
         ShowImage::Raw => app.render_resized(f, Resize::Scale(None), area),
-        ShowImage::FloydSteinberg => app.render_floyd_steinberg(f, Resize::Scale(None), area),
-        ShowImage::Stucki => app.render_stucki(f, Resize::Scale(None), area),
+        _ => app.render_dithered(f, Resize::Scale(None), area),
     }
 
     // SNACKBAR
@@ -106,7 +105,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     // FOOTER
     let current_keys_hint = {
         Span::styled(
-            "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Save (s) | Exit (q)",
+            "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Jarvis (4)| Atkinson (5) | Save (s) | Exit (q)",
             Style::default().fg(Color::Blue),
         )
     };
