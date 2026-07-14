@@ -46,9 +46,13 @@ where
                         break Ok(false);
                     }
                     KeyCode::Char('s') => {
-                        app.save_dither(app.dithered_image.clone());
+                        let image = app.dithered_image.clone();
+                        match image {
+                            Some(image) => app.save_dither(image),
+                            None => app.snackbar = "No dithered image".to_string(),
+                        }
                     }
-                    KeyCode::Char('e') => {
+                    KeyCode::Char('r') => {
                         app.input_mode = InputMode::Editing;
                     }
                     KeyCode::Esc => {

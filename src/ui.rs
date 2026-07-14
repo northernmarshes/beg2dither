@@ -23,7 +23,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
             // Constraint::Length(3),
             Constraint::Length(50),
             Constraint::Length(3),
-            Constraint::Length(3),
+            Constraint::Length(6),
         ])
         .split(f.area());
 
@@ -61,7 +61,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
             InputMode::Normal => Style::default(),
             InputMode::Editing => Style::default().fg(Color::Yellow),
         })
-        .block(Block::bordered().title("Output width (e)/esc"));
+        .block(Block::bordered().title("Output width (r)/ESC"));
     f.render_widget(input, explorer_chunks[2]);
     match app.input_mode {
         InputMode::Normal => {}

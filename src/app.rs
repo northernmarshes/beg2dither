@@ -56,7 +56,7 @@ pub struct App {
 
 impl App {
     pub fn new() -> App {
-        let path: String = "./assets/dc01.JPG".to_string();
+        let path: String = "hello.jpg".to_string();
         let algorithm_bar: String = "Raw".to_string();
         let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
         let dithered_image = None;
@@ -179,13 +179,14 @@ impl App {
     }
 
     // Save the dithered image
-    pub fn save_dither(&mut self, image: Option<RawImage>) {
+    pub fn save_dither(&mut self, image: RawImage) {
         let RawImage {
             buffer,
             width,
             height,
-        } = image.unwrap();
-        save_image(buffer.clone(), PathBuf::from("dithered.png"), width, height);
+        } = image;
+        self.snackbar = "Image saved as output.png!".to_string();
+        save_image(buffer.clone(), PathBuf::from("output.png"), width, height);
     }
 
     // Get file explorer showing only pictures and directories
