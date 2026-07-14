@@ -1,4 +1,4 @@
-use crate::app::{App, InputMode, ShowImage};
+use crate::app::{App, Display, InputMode, ShowImage};
 use crate::ui::ui;
 use crossterm::event::KeyEventKind;
 use ratatui::crossterm::{
@@ -42,19 +42,24 @@ where
             match app.input_mode {
                 InputMode::Normal => match key.code {
                     KeyCode::Char('q') => {
-                        app.should_quit = true;
                         break Ok(false);
                     }
                     KeyCode::Char('s') => {
                         let image = app.dithered_image.clone();
                         match image {
                             Some(image) => app.save_dither(image),
-                            None => app.snackbar = "No dithered image!".to_string(),
+                            None => {
+                                app.snackbar = "To save choose a dithering algorithm!".to_string()
+                            }
                         }
                     }
-                    KeyCode::Char('r') => {
-                        app.input_mode = InputMode::Editing;
-                    }
+                    KeyCode::Char('r') => match app.display {
+                        Display::Yes => {
+                            app.input_mode = InputMode::Editing;
+                            app.snackbar = "Please insert pixel width".to_string();
+                        }
+                        Display::No => app.snackbar = "Chose image to resize".to_string(),
+                    },
                     KeyCode::Esc => {
                         app.input_mode = InputMode::Normal;
                     }

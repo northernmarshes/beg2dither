@@ -12,6 +12,7 @@ use ratatui_explorer::FileExplorer;
 use ratatui_image::Resize;
 
 use crate::app::App;
+use crate::app::Display;
 use crate::app::InputMode;
 use crate::app::ShowImage;
 
@@ -76,14 +77,16 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     let area = block.inner(main_chunks[1]);
     f.render_widget(block, main_chunks[1]);
 
-    match app.show_image {
-        ShowImage::NoImage => {} // _ => {}
-        ShowImage::Raw => app.render_resized(f, Resize::Scale(None), area),
-        _ => app.render_dithered(f, Resize::Scale(None), area),
+    match app.display {
+        Display::Yes => match app.show_image {
+            ShowImage::Raw => app.render_resized(f, Resize::Scale(None), area),
+            _ => app.render_dithered(f, Resize::Scale(None), area),
+        },
+        Display::No => {}
     }
 
     // SNACKBAR
-    let snackbar = { Span::styled(app.snackbar.to_string(), Style::default().fg(Color::Red)) };
+    let snackbar = { Span::styled(app.snackbar.to_string(), Style::default().fg(Color::Green)) };
     let snackbar_paragraph = Paragraph::new(Line::from(snackbar))
         .alignment(Alignment::Center)
         .block(Block::default().borders(Borders::ALL));
@@ -95,7 +98,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Jarvis (4)| Atkinson (5) | None (6)",
         Style::default(),
     );
-    let functions = Span::styled("Resize(r) | Save (s) | Exit (q)", Style::default());
+    let functions = Span::styled("Resize (r) | Save (s) | Exit (q)", Style::default());
     let controls: Vec<Line<'_>> = vec![algorithms.into(), functions.into()];
     f.render_widget(
         Paragraph::new(controls)

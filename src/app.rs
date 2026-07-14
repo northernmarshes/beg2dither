@@ -20,13 +20,17 @@ use std::path::Path;
 use std::path::PathBuf;
 
 pub enum ShowImage {
-    NoImage,
     Raw,
     FloydSteinberg,
     Stucki,
     Jarvis,
     Atkinson,
     None,
+}
+
+pub enum Display {
+    Yes,
+    No,
 }
 
 pub enum InputMode {
@@ -42,34 +46,23 @@ pub struct RawImage {
 }
 
 pub struct App {
+    pub path: Option<String>,
+    pub display: Display,
     pub input_mode: InputMode,
     pub show_image: ShowImage,
     pub dithered_image: Option<RawImage>,
-
-    pub path: Option<String>,
     pub image_source: Option<DynamicImage>,
     pub picker: Option<Picker>,
     pub image_scale_state: Option<StatefulProtocol>,
-
     pub output_width: u32,
     pub input: String,
     pub character_index: usize,
-    pub should_quit: bool,
     pub algorithm_bar: String,
     pub snackbar: String,
 }
 
 impl App {
     pub fn new() -> App {
-        // let path: String = "hello.jpg".to_string();
-        // let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
-        // let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
-        //     terminal_background_color_osc: true,
-        //     text_sizing_protocol: true,
-        //     ..Default::default()
-        // })
-        // .unwrap();
-        // let image_scale_state = picker.new_resize_protocol(image_source.clone());
         let path: Option<String> = Some(
             env::home_dir()
                 .unwrap()
@@ -80,17 +73,17 @@ impl App {
         let image_source = None;
         let picker = None;
         let image_scale_state = None;
-
         let algorithm_bar: String = "No image".to_string();
         let dithered_image = None;
         let snackbar: String = "".to_string();
         let output_width: u32 = 300;
         let input = output_width.to_string();
         App {
+            display: Display::No,
             path,
             algorithm_bar,
             input_mode: InputMode::Normal,
-            show_image: ShowImage::NoImage,
+            show_image: ShowImage::Raw,
             snackbar,
             dithered_image,
             image_source,
@@ -99,7 +92,6 @@ impl App {
             input,
             output_width,
             character_index: 3,
-            should_quit: false,
         }
     }
 
@@ -121,6 +113,7 @@ impl App {
         })
     }
 
+    // Dither with chosen algorithm
     pub fn dither_it(
         &mut self,
         mut buffer: Vec<u8>,
@@ -128,8 +121,7 @@ impl App {
         height: u32,
     ) -> Result<RawImage, Errors> {
         let dither_type = match self.show_image {
-            // first 2 do nothing
-            ShowImage::NoImage => DitherMethod::None,
+            // Raw should be somehow omitted, doesn't need dither
             ShowImage::Raw => DitherMethod::None,
             ShowImage::FloydSteinberg => DitherMethod::FloydSteinberg,
             ShowImage::Stucki => DitherMethod::Stucki,
@@ -166,18 +158,21 @@ impl App {
         let inner_area = block.inner(area);
         let path = self.path.clone();
 
+        // Resizing
         let RawImage {
             buffer,
             width,
             height,
         } = self.get_resized(&path.unwrap(), self.output_width).unwrap();
 
+        // Dithering
         let RawImage {
             buffer,
             width,
             height,
         } = self.dither_it(buffer, width, height).unwrap();
 
+        // Updating App state
         self.dithered_image = Some(RawImage {
             buffer: buffer.clone(),
             width,
@@ -207,12 +202,13 @@ impl App {
             width,
             height,
         } = image;
-        self.snackbar = "Image saved as output.png!".to_string();
+        self.snackbar = "Image saved as output.png :3".to_string();
         save_image(buffer.clone(), PathBuf::from("output.png"), width, height);
     }
 
     // Get file explorer showing only pictures and directories
     pub fn get_explorer() -> Result<FileExplorer, Box<dyn Error>> {
+        // formats should be moved to App struct
         const SUPPORTED_FORMATS: [&str; 3] = ["jpg", "png", "JPG"];
         let theme = Theme::default().add_default_title();
         let mut file_explorer = FileExplorerBuilder::build_with_theme(theme)?;
@@ -239,6 +235,7 @@ impl App {
             .unwrap_or("/");
         if image_extensions.contains(&extension) {
             self.path = Some(img_path.clone()); // updating the path
+            self.display = Display::Yes;
             let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
                 terminal_background_color_osc: true,
                 text_sizing_protocol: true,
@@ -256,7 +253,8 @@ impl App {
             self.image_scale_state = Some(picker.new_resize_protocol(image.unwrap()));
         }
         if fe.current().path.is_dir() {
-            self.show_image = ShowImage::NoImage;
+            // self.show_image = ShowImage::NoImage;
+            self.display = Display::No;
             self.algorithm_bar = "None".to_string();
         }
     }
@@ -311,6 +309,7 @@ impl App {
             let input = self.input.parse().unwrap_or(300);
             if input > 30 && input < 9000 {
                 self.output_width = self.input.parse().unwrap_or(300);
+                self.snackbar = "Image succesfuly resized".to_string()
             } else {
                 self.snackbar = "The value has to be between 30 and 9000!".to_string();
             }
