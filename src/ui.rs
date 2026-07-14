@@ -23,7 +23,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
             // Constraint::Length(3),
             Constraint::Length(50),
             Constraint::Length(3),
-            Constraint::Length(6),
+            Constraint::Length(4),
         ])
         .split(f.area());
 
@@ -36,10 +36,10 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     let explorer_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length(3),
-            Constraint::Length(37),
-            Constraint::Length(3),
-            Constraint::Length(10),
+            Constraint::Length(3),  // current algorithm
+            Constraint::Length(40), // file explorer
+            Constraint::Length(3),  // width
+                                    // Constraint::Length(10),
         ])
         .split(main_chunks[0]);
 
@@ -61,7 +61,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
             InputMode::Normal => Style::default(),
             InputMode::Editing => Style::default().fg(Color::Yellow),
         })
-        .block(Block::bordered().title("Output width (r)/ESC"));
+        .block(Block::bordered().title("Width (r)"));
     f.render_widget(input, explorer_chunks[2]);
     match app.input_mode {
         InputMode::Normal => {}
@@ -76,13 +76,13 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     f.render_widget_ref(fe.widget(), explorer_chunks[1]);
 
     // HISTOGRAM
-    let title_block = Block::default().borders(Borders::ALL).title("Histogram");
-    let word = "stats".to_string();
-    let title = Paragraph::new(Text::styled(word, Style::default().fg(Color::Green)))
-        .alignment(Alignment::Center)
-        .block(title_block);
-
-    f.render_widget(title, explorer_chunks[3]);
+    // let title_block = Block::default().borders(Borders::ALL).title("Histogram");
+    // let word = "stats".to_string();
+    // let title = Paragraph::new(Text::styled(word, Style::default().fg(Color::Green)))
+    //     .alignment(Alignment::Center)
+    //     .block(title_block);
+    //
+    // f.render_widget(title, explorer_chunks[3]);
 
     // PREVIEW
     let block = Block::default().borders(Borders::ALL).title("Image");
@@ -103,19 +103,21 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     f.render_widget(snackbar_paragraph, chunks[1]);
 
     // FOOTER
-    let current_keys_hint = {
-        Span::styled(
-            "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Jarvis (4)| Atkinson (5) | Save (s) | Exit (q)",
-            Style::default().fg(Color::Blue),
-        )
-    };
-    let placeholder_footer = Paragraph::new(Line::from(current_keys_hint))
-        .alignment(Alignment::Center)
-        .block(Block::default().borders(Borders::ALL));
-    let footer_chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(100)])
-        .split(chunks[2]);
-
-    f.render_widget(placeholder_footer, footer_chunks[0]);
+    let algorithms = Span::styled(
+        "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Jarvis (4)| Atkinson (5)",
+        // Style::default().fg(Color::Black).bg(Color::White),
+        Style::default(),
+    );
+    let functions = Span::styled(
+        "Resize(r) | Save (s) | Exit (q)",
+        // Style::default().add_modifier(Modifier::BOLD),
+        Style::default(),
+    );
+    let controls: Vec<Line<'_>> = vec![algorithms.into(), functions.into()];
+    f.render_widget(
+        Paragraph::new(controls)
+            .block(Block::default().borders(Borders::ALL))
+            .alignment(Alignment::Center),
+        chunks[2],
+    );
 }

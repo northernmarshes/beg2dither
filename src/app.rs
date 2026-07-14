@@ -39,13 +39,15 @@ pub struct RawImage {
 }
 
 pub struct App {
-    pub path: String,
     pub input_mode: InputMode,
     pub show_image: ShowImage,
     pub dithered_image: Option<RawImage>,
+
+    pub path: String,
     pub image_source: DynamicImage,
     pub picker: Picker,
     pub image_scale_state: StatefulProtocol,
+
     pub output_width: u32,
     pub input: String,
     pub character_index: usize,

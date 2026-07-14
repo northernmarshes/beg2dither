@@ -49,7 +49,7 @@ where
                         let image = app.dithered_image.clone();
                         match image {
                             Some(image) => app.save_dither(image),
-                            None => app.snackbar = "No dithered image".to_string(),
+                            None => app.snackbar = "No dithered image!".to_string(),
                         }
                     }
                     KeyCode::Char('r') => {
@@ -61,6 +61,7 @@ where
                     KeyCode::Char('1') => {
                         app.algorithm_bar = "Raw".to_string();
                         app.show_image = ShowImage::Raw;
+                        app.dithered_image = None;
                     }
                     KeyCode::Char('2') => {
                         app.algorithm_bar = "Floyd Steinberg".to_string();
@@ -82,6 +83,7 @@ where
                 },
                 InputMode::Editing if key.kind == KeyEventKind::Press => match key.code {
                     KeyCode::Enter => app.submit_message(),
+                    KeyCode::Char('r') => app.submit_message(),
                     KeyCode::Char(to_insert) => app.enter_char(to_insert),
                     KeyCode::Backspace => app.delete_char(),
                     KeyCode::Left => app.move_cursor_left(),
