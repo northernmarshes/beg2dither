@@ -170,6 +170,7 @@ impl App {
             buffer,
             width,
             height,
+            // This panics when there is a problem with decoding, need better error handling
         } = self.dither_it(buffer, width, height).unwrap();
 
         // Updating App state
@@ -208,7 +209,7 @@ impl App {
 
     // Get file explorer showing only pictures and directories
     pub fn get_explorer() -> Result<FileExplorer, Box<dyn Error>> {
-        // formats should be moved to App struct
+        // formats should be moved to App struct as a vec
         const SUPPORTED_FORMATS: [&str; 3] = ["jpg", "png", "JPG"];
         let theme = Theme::default().add_default_title();
         let mut file_explorer = FileExplorerBuilder::build_with_theme(theme)?;
@@ -227,6 +228,7 @@ impl App {
 
     // Update path with files with image extension
     pub fn update(&mut self, fe: &FileExplorer) {
+        // formats should be moved to App struct as a vec
         let image_extensions: [&str; 3] = ["jpg", "png", "JPG"];
         let img_path = &fe.current().path.display().to_string();
         let extension = Path::new(img_path)
@@ -247,13 +249,12 @@ impl App {
                 image::ImageReader::open(img_path.clone())
                     .unwrap()
                     .decode()
-                    .unwrap(),
+                    .unwrap_or_default(),
             );
             let image = self.image_source.clone();
             self.image_scale_state = Some(picker.new_resize_protocol(image.unwrap()));
         }
         if fe.current().path.is_dir() {
-            // self.show_image = ShowImage::NoImage;
             self.display = Display::No;
             self.algorithm_bar = "None".to_string();
         }

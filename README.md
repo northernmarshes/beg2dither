@@ -1,8 +1,9 @@
 # ratadot
 
-A simple TUI for dithering images with live preview.
+A TUI for image dithering with a live preview.
 
-Let's assume you have Rust already installed. If not follow the [instructions.](https://rust-lang.org/tools/install/)
+If you do not have Rust installed follow the [instructions](https://rust-lang.org/tools/install/).
+Once installed, enter the directory and compile in release mode.
 
 ``` bash
 cd ratadot
@@ -13,8 +14,12 @@ cargo run --release
 
 ## Available algorithms
 
-- Floyd Steinberg,
+- Floyd Steinberg
 - Stucki
 - Jarvis
 - Atkinson
 - None
+
+## Compatibile terminal emulators
+
+See [ratatui-image](https://github.com/ratatui/ratatui-image).
