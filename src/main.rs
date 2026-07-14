@@ -79,6 +79,10 @@ where
                         app.algorithm_bar = "Atkinson".to_string();
                         app.show_image = ShowImage::Atkinson;
                     }
+                    KeyCode::Char('6') => {
+                        app.algorithm_bar = "None".to_string();
+                        app.show_image = ShowImage::None;
+                    }
                     _ => {}
                 },
                 InputMode::Editing if key.kind == KeyEventKind::Press => match key.code {

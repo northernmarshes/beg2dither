@@ -13,17 +13,20 @@ use ratatui_image::errors::Errors;
 use ratatui_image::picker::cap_parser::QueryStdioOptions;
 use ratatui_image::protocol::StatefulProtocol;
 use ratatui_image::{Resize, picker::Picker};
+use std::env;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::path::Path;
 use std::path::PathBuf;
 
 pub enum ShowImage {
+    NoImage,
     Raw,
     FloydSteinberg,
     Stucki,
     Jarvis,
     Atkinson,
+    None,
 }
 
 pub enum InputMode {
@@ -43,10 +46,10 @@ pub struct App {
     pub show_image: ShowImage,
     pub dithered_image: Option<RawImage>,
 
-    pub path: String,
-    pub image_source: DynamicImage,
-    pub picker: Picker,
-    pub image_scale_state: StatefulProtocol,
+    pub path: Option<String>,
+    pub image_source: Option<DynamicImage>,
+    pub picker: Option<Picker>,
+    pub image_scale_state: Option<StatefulProtocol>,
 
     pub output_width: u32,
     pub input: String,
@@ -58,26 +61,36 @@ pub struct App {
 
 impl App {
     pub fn new() -> App {
-        let path: String = "hello.jpg".to_string();
-        let algorithm_bar: String = "Raw".to_string();
-        let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
+        // let path: String = "hello.jpg".to_string();
+        // let image_source: DynamicImage = image::ImageReader::open(&path).unwrap().decode().unwrap();
+        // let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
+        //     terminal_background_color_osc: true,
+        //     text_sizing_protocol: true,
+        //     ..Default::default()
+        // })
+        // .unwrap();
+        // let image_scale_state = picker.new_resize_protocol(image_source.clone());
+        let path: Option<String> = Some(
+            env::home_dir()
+                .unwrap()
+                .into_os_string()
+                .into_string()
+                .unwrap(),
+        );
+        let image_source = None;
+        let picker = None;
+        let image_scale_state = None;
+
+        let algorithm_bar: String = "No image".to_string();
         let dithered_image = None;
         let snackbar: String = "".to_string();
-        let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
-            terminal_background_color_osc: true,
-            text_sizing_protocol: true,
-            ..Default::default()
-        })
-        .unwrap();
-        // let dithered_image:
-        let image_scale_state = picker.new_resize_protocol(image_source.clone());
         let output_width: u32 = 300;
         let input = output_width.to_string();
         App {
             path,
             algorithm_bar,
             input_mode: InputMode::Normal,
-            show_image: ShowImage::Raw,
+            show_image: ShowImage::NoImage,
             snackbar,
             dithered_image,
             image_source,
@@ -115,11 +128,14 @@ impl App {
         height: u32,
     ) -> Result<RawImage, Errors> {
         let dither_type = match self.show_image {
-            ShowImage::Raw => DitherMethod::FloydSteinberg,
+            // first 2 do nothing
+            ShowImage::NoImage => DitherMethod::None,
+            ShowImage::Raw => DitherMethod::None,
             ShowImage::FloydSteinberg => DitherMethod::FloydSteinberg,
             ShowImage::Stucki => DitherMethod::Stucki,
             ShowImage::Jarvis => DitherMethod::Jarvis,
             ShowImage::Atkinson => DitherMethod::Atkinson,
+            ShowImage::None => DitherMethod::None,
         };
 
         dither(
@@ -138,7 +154,7 @@ impl App {
 
     // Render RAW resized
     pub fn render_resized(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
-        let state = &mut self.image_scale_state;
+        let state = self.image_scale_state.as_mut().unwrap();
         let block = block("Image");
         let inner_area = block.inner(area);
         f.render_stateful_widget(StatefulImage::new().resize(resize), inner_area, state);
@@ -148,12 +164,13 @@ impl App {
     pub fn render_dithered(&mut self, f: &mut Frame<'_>, resize: Resize, area: Rect) {
         let block = block("Image");
         let inner_area = block.inner(area);
+        let path = self.path.clone();
 
         let RawImage {
             buffer,
             width,
             height,
-        } = self.get_resized(&self.path, self.output_width).unwrap();
+        } = self.get_resized(&path.unwrap(), self.output_width).unwrap();
 
         let RawImage {
             buffer,
@@ -170,8 +187,11 @@ impl App {
         let dithered: ImageBuffer<Rgb<u8>, Vec<u8>> =
             ImageBuffer::from_raw(width, height, buffer).unwrap();
         let dynamic = DynamicImage::from(dithered);
-        let dithered_protocol: &mut StatefulProtocol =
-            &mut self.picker.new_resize_protocol(dynamic.clone());
+        let dithered_protocol: &mut StatefulProtocol = &mut self
+            .picker
+            .as_mut()
+            .unwrap()
+            .new_resize_protocol(dynamic.clone());
 
         f.render_stateful_widget(
             StatefulImage::new().resize(resize),
@@ -216,14 +236,28 @@ impl App {
         let extension = Path::new(img_path)
             .extension()
             .and_then(OsStr::to_str)
-            .unwrap_or("../assets/01.png");
+            .unwrap_or("/");
         if image_extensions.contains(&extension) {
-            self.path = img_path.clone();
-            self.image_source = image::ImageReader::open(&self.path)
-                .unwrap()
-                .decode()
-                .unwrap();
-            self.image_scale_state = self.picker.new_resize_protocol(self.image_source.clone());
+            self.path = Some(img_path.clone()); // updating the path
+            let picker: Picker = Picker::from_query_stdio_with_options(QueryStdioOptions {
+                terminal_background_color_osc: true,
+                text_sizing_protocol: true,
+                ..Default::default()
+            })
+            .unwrap();
+            self.picker = Some(picker.clone()); // updating the picker
+            self.image_source = Some(
+                image::ImageReader::open(img_path.clone())
+                    .unwrap()
+                    .decode()
+                    .unwrap(),
+            );
+            let image = self.image_source.clone();
+            self.image_scale_state = Some(picker.new_resize_protocol(image.unwrap()));
+        }
+        if fe.current().path.is_dir() {
+            self.show_image = ShowImage::NoImage;
+            self.algorithm_bar = "None".to_string();
         }
     }
 
