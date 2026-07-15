@@ -58,7 +58,7 @@ where
                             app.input_mode = InputMode::Editing;
                             app.snackbar = "Please insert pixel width".to_string();
                         }
-                        Display::No => app.snackbar = "Chose image to resize".to_string(),
+                        Display::No => app.snackbar = "Choose an image to resize".to_string(),
                     },
                     KeyCode::Esc => {
                         app.input_mode = InputMode::Normal;
