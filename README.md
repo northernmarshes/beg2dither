@@ -11,8 +11,6 @@ cd b2d
 cargo run --release
 ```
 
-You are probably going to need to install [chafa](https://hpjansson.org/chafa/download/) and pkgconf to display the preview.
-
 ## Available algorithms
 
 - Floyd Steinberg
@@ -23,8 +21,9 @@ You are probably going to need to install [chafa](https://hpjansson.org/chafa/do
 
 ## Compatibile terminal emulators
 
-See [ratatui-image](https://github.com/ratatui/ratatui-image).
+For terminal list see [ratatui-image](https://github.com/ratatui/ratatui-image).
+You are probably going to need to install [chafa](https://hpjansson.org/chafa/download/) to display the preview.
 
 ## Disclaimer
 
-100% human coded - all bugs carefully crafted by hand.
+Coded by a human - all bugs carefully crafted by hand.
