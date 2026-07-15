@@ -1,4 +1,4 @@
-# b2d
+# beg2dither
 
 A TUI for image dithering with live preview.<br>
 
@@ -7,7 +7,7 @@ A TUI for image dithering with live preview.<br>
 If you do not have Rust installed follow the [instructions](https://rust-lang.org/tools/install/).<br> Once installed, enter the directory and run in release mode.
 
 ``` bash
-cd b2d
+cd beg2dither
 cargo run --release
 ```
 
