@@ -2,7 +2,7 @@
 
 A TUI for image dithering with live preview.<br>
 
-![Screenshot](screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/northernmarshes/beg2dither/7e0862ca65b4ad5d98e76ca0f3e26477806db679/screenshot.png)
 
 If you do not have Rust installed follow the [instructions](https://rust-lang.org/tools/install/).<br> Once installed, enter the directory and run in release mode.
 

@@ -197,18 +197,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "b2d"
-version = "0.1.0"
-dependencies = [
- "crossterm",
- "dithers",
- "image",
- "ratatui",
- "ratatui-explorer",
- "ratatui-image",
-]
-
-[[package]]
 name = "base64"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -222,6 +210,18 @@ checksum = "339abbe78e73178762e23bea9dfd08e697eb3f3301cd4be981c0f78ba5859195"
 dependencies = [
  "outref",
  "vsimd",
+]
+
+[[package]]
+name = "beg2dither"
+version = "0.1.0"
+dependencies = [
+ "crossterm",
+ "dithers",
+ "image",
+ "ratatui",
+ "ratatui-explorer",
+ "ratatui-image",
 ]
 
 [[package]]
