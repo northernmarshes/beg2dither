@@ -310,7 +310,7 @@ impl App {
             let input = self.input.parse().unwrap_or(300);
             if input > 30 && input < 9000 {
                 self.output_width = self.input.parse().unwrap_or(300);
-                self.snackbar = "Image succesfuly resized".to_string()
+                self.snackbar = "Image successfully resized".to_string()
             } else {
                 self.snackbar = "The value has to be between 30 and 9000!".to_string();
             }
