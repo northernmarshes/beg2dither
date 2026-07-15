@@ -11,7 +11,7 @@ cd b2d
 cargo run --release
 ```
 
-## Available algorithms
+## Algorithms
 
 - Floyd Steinberg
 - Stucki
@@ -19,9 +19,9 @@ cargo run --release
 - Atkinson
 - None
 
-## Compatibile terminal emulators
+## Requirements
 
-For terminal list see [ratatui-image](https://github.com/ratatui/ratatui-image).
+For the list of compatible terminal emulators see [ratatui-image](https://github.com/ratatui/ratatui-image).
 You are probably going to need to install [chafa](https://hpjansson.org/chafa/download/) to display the preview.
 
 ## Disclaimer
