@@ -1,4 +1,4 @@
-# ratadot
+# b2d
 
 A TUI for image dithering with live preview.<br>
 
@@ -7,7 +7,7 @@ A TUI for image dithering with live preview.<br>
 If you do not have Rust installed follow the [instructions](https://rust-lang.org/tools/install/).<br> Once installed, enter the directory and run in release mode.
 
 ``` bash
-cd ratadot
+cd b2d
 cargo run --release
 ```
 
