@@ -1,13 +1,10 @@
-use ratatui::Frame;
-use ratatui::layout::Alignment;
-use ratatui::layout::Constraint;
-use ratatui::layout::Direction;
-use ratatui::layout::Layout;
-use ratatui::layout::Position;
-use ratatui::style::{Color, Style};
-use ratatui::text::{Line, Span, Text};
-use ratatui::widgets::FrameExt as _;
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::{
+    Frame,
+    layout::{Alignment, Constraint, Direction, Layout, Position},
+    style::{Color, Style},
+    text::{Line, Span, Text},
+    widgets::{Block, Borders, FrameExt as _, Paragraph},
+};
 use ratatui_explorer::FileExplorer;
 use ratatui_image::Resize;
 

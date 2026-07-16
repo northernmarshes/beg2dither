@@ -2,6 +2,14 @@
 name = "beg2dither"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+authors = ["Edna Baud <ednabaud@gmail.com>"]
+description = "An image dithering TUI with live preview"
+readme = "README.md"
+keywords = ["terminal", "tui", "dither"]
+categories = ["graphics"]
+repository = "https://github.com/northernmarshes/beg2dither"
+homepage = "https://github.com/northernmarshes/beg2dither"
 
 [dependencies]
 crossterm = "0.29.0"

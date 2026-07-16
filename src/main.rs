@@ -1,14 +1,18 @@
 use crate::app::{App, Display, InputMode, ShowImage};
 use crate::ui::ui;
 use crossterm::event::KeyEventKind;
-use ratatui::crossterm::{
-    ExecutableCommand,
-    event::{Event, KeyCode, read},
-    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+use ratatui::{
+    crossterm::{
+        ExecutableCommand,
+        event::{Event, KeyCode, read},
+        terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+    },
+    prelude::*,
 };
-use ratatui::prelude::*;
-use std::error::Error;
-use std::io::{self, stdout};
+use std::{
+    error::Error,
+    io::{self, stdout},
+};
 
 mod app;
 mod ui;

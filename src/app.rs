@@ -1,23 +1,19 @@
-use dithers::dither::{DitherMethod, dither, save_image};
-use dithers::palette::ColorPalette;
-use image::DynamicImage;
-use image::ImageBuffer;
-use image::Rgb;
-use image::imageops::FilterType;
-use ratatui::Frame;
-use ratatui::layout::Rect;
-use ratatui::widgets::{Block, Borders};
+use dithers::{
+    dither::{DitherMethod, dither, save_image},
+    palette::ColorPalette,
+};
+use image::{DynamicImage, ImageBuffer, Rgb, imageops::FilterType};
+use ratatui::{
+    Frame,
+    layout::Rect,
+    widgets::{Block, Borders},
+};
 use ratatui_explorer::{FileExplorer, FileExplorerBuilder, Theme};
-use ratatui_image::StatefulImage;
-use ratatui_image::errors::Errors;
-use ratatui_image::picker::cap_parser::QueryStdioOptions;
-use ratatui_image::protocol::StatefulProtocol;
-use ratatui_image::{Resize, picker::Picker};
-use std::env;
-use std::error::Error;
-use std::ffi::OsStr;
-use std::path::Path;
-use std::path::PathBuf;
+use ratatui_image::{
+    Resize, StatefulImage, errors::Errors, picker::Picker, picker::cap_parser::QueryStdioOptions,
+    protocol::StatefulProtocol,
+};
+use std::{env, error::Error, ffi::OsStr, path::Path, path::PathBuf};
 
 pub enum ShowImage {
     Raw,
@@ -68,6 +64,7 @@ impl App {
                 .unwrap()
                 .into_os_string()
                 .into_string()
+                // TODO: Add default path
                 .unwrap(),
         );
         let image_source = None;
@@ -95,7 +92,7 @@ impl App {
         }
     }
 
-    // Resize te preview to have nice display
+    // Resize the preview
     pub fn get_resized(
         &self,
         path: &str,
@@ -121,7 +118,7 @@ impl App {
         height: u32,
     ) -> Result<RawImage, Errors> {
         let dither_type = match self.show_image {
-            // Raw should be somehow omitted, doesn't need dither
+            //TODO: Raw should be somehow omitted, doesn't need dither
             ShowImage::Raw => DitherMethod::None,
             ShowImage::FloydSteinberg => DitherMethod::FloydSteinberg,
             ShowImage::Stucki => DitherMethod::Stucki,
@@ -158,14 +155,14 @@ impl App {
         let inner_area = block.inner(area);
         let path = self.path.clone();
 
-        // Resizing
+        // Resize
         let RawImage {
             buffer,
             width,
             height,
         } = self.get_resized(&path.unwrap(), self.output_width).unwrap();
 
-        // Dithering
+        // Dither
         let RawImage {
             buffer,
             width,
@@ -173,7 +170,7 @@ impl App {
             // This panics when there is a problem with decoding, need better error handling
         } = self.dither_it(buffer, width, height).unwrap();
 
-        // Updating App state
+        // Update App
         self.dithered_image = Some(RawImage {
             buffer: buffer.clone(),
             width,
@@ -196,7 +193,7 @@ impl App {
         );
     }
 
-    // Save the dithered image
+    // Save DITHERED image
     pub fn save_dither(&mut self, image: RawImage) {
         let RawImage {
             buffer,
@@ -209,7 +206,7 @@ impl App {
 
     // Get file explorer showing only pictures and directories
     pub fn get_explorer() -> Result<FileExplorer, Box<dyn Error>> {
-        // formats should be moved to App struct as a vec
+        // TODO: extensions should be moved to App struct as a vec
         const SUPPORTED_FORMATS: [&str; 3] = ["jpg", "png", "JPG"];
         let theme = Theme::default().add_default_title();
         let mut file_explorer = FileExplorerBuilder::build_with_theme(theme)?;
@@ -226,9 +223,9 @@ impl App {
         Ok(file_explorer)
     }
 
-    // Update path with files with image extension
+    // Update path with files bearing image extension
     pub fn update(&mut self, fe: &FileExplorer) {
-        // formats should be moved to App struct as a vec
+        // TODO: extensions should be moved to App struct as a vec
         let image_extensions: [&str; 3] = ["jpg", "png", "JPG"];
         let img_path = &fe.current().path.display().to_string();
         let extension = Path::new(img_path)
