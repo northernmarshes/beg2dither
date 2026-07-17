@@ -4,11 +4,47 @@ A TUI for image dithering with live preview.<br>
 
 ![Screenshot](https://raw.githubusercontent.com/northernmarshes/beg2dither/7e0862ca65b4ad5d98e76ca0f3e26477806db679/screenshot.png)
 
-If you do not have Rust installed follow the [instructions](https://rust-lang.org/tools/install/).<br> Once installed, enter the directory and run in release mode.
+## Installation
+
+If you do not have Rust installed follow the [instructions](https://rust-lang.org/tools/install/).<br>
+
+### Via crates.io
+
+Install:
+
+```bash
+cargo install beg2dither
+```
+
+and run:
+
+```bash
+b2d
+```
+
+### Manual installation
+
+Clone the repository and run in release mode:
 
 ``` bash
+git clone https://github.com/northernmarshes/beg2dither
 cd beg2dither
 cargo run --release
+```
+
+## Update
+
+If you installed from crates.io you can update.<br>
+First install cargo-update:
+
+```bash
+cargo install cargo-update
+```
+
+And run:
+
+```bash
+cargo install-update beg2dither
 ```
 
 ## Algorithms
