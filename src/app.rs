@@ -200,8 +200,18 @@ impl App {
             width,
             height,
         } = image;
-        self.snackbar = "Image saved as output.png :3".to_string();
-        save_image(buffer.clone(), PathBuf::from("output.png"), width, height);
+        self.snackbar = "Image saved as 'b2d_output.png' :3".to_string();
+        let path_exists = PathBuf::from("b2d_output.png").exists();
+        if path_exists {
+            self.snackbar = "File 'b2d_output.png' already exists".to_string();
+        } else {
+            save_image(
+                buffer.clone(),
+                PathBuf::from("b2d_output.png"),
+                width,
+                height,
+            );
+        }
     }
 
     // Get file explorer showing only pictures and directories
