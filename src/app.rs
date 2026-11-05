@@ -282,6 +282,7 @@ impl App {
     }
 
     // Input section
+    // Contrast
     pub fn increment_contrast(&mut self) {
         if self.contrast < 50.0 {
             self.contrast += 1.0;
@@ -294,6 +295,7 @@ impl App {
         }
     }
 
+    // Width cursor movement
     pub fn move_cursor_left(&mut self) {
         let cursor_moved_left = self.character_index.saturating_sub(1);
         self.character_index = self.clamp_cursor(cursor_moved_left);

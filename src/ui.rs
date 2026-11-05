@@ -51,18 +51,21 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     f.render_widget(title, explorer_chunks[0]);
 
     // WIDTH INPUT
+    //
+
     let input = Paragraph::new(app.input.to_string())
         .style(match app.input_mode {
             InputMode::Normal => Style::default(),
             InputMode::Editing => Style::default().fg(Color::Yellow),
         })
+        .alignment(Alignment::Center)
         .block(Block::bordered().title("Width (r)"));
     f.render_widget(input, explorer_chunks[2]);
     match app.input_mode {
         InputMode::Normal => {}
         #[expect(clippy::cast_possible_truncation)]
         InputMode::Editing => f.set_cursor_position(Position::new(
-            explorer_chunks[2].x + app.character_index as u16 + 1,
+            explorer_chunks[2].width / 2 + (app.character_index as u16).div_ceil(2),
             explorer_chunks[2].y + 1,
         )),
     }
