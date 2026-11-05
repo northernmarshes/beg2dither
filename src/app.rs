@@ -43,7 +43,7 @@ pub struct RawImage {
 
 pub struct App {
     pub path: Option<String>,
-    pub contrast: u8,
+    pub contrast: i8,
     pub display: Display,
     pub input_mode: InputMode,
     pub show_image: ShowImage,
@@ -271,6 +271,18 @@ impl App {
     }
 
     // Input section
+    pub fn increment_contrast(&mut self) {
+        if self.contrast < 50 {
+            self.contrast += 1;
+        }
+    }
+
+    pub fn decrement_contrast(&mut self) {
+        if self.contrast > -50 {
+            self.contrast -= 1;
+        }
+    }
+
     pub fn move_cursor_left(&mut self) {
         let cursor_moved_left = self.character_index.saturating_sub(1);
         self.character_index = self.clamp_cursor(cursor_moved_left);
