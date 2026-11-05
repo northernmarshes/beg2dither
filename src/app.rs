@@ -43,7 +43,7 @@ pub struct RawImage {
 
 pub struct App {
     pub path: Option<String>,
-    pub contrast: i8,
+    pub contrast: f32,
     pub display: Display,
     pub input_mode: InputMode,
     pub show_image: ShowImage,
@@ -78,7 +78,7 @@ impl App {
         let input = output_width.to_string();
         App {
             display: Display::No,
-            contrast: 0,
+            contrast: 0.0,
             path,
             algorithm_bar,
             input_mode: InputMode::Normal,
@@ -101,6 +101,7 @@ impl App {
         width: u32,
     ) -> Result<RawImage, ratatui_image::errors::Errors> {
         let image = image::ImageReader::open(path)?.decode()?;
+        let image = image.adjust_contrast(self.contrast * 2.0);
         let filter = FilterType::Nearest;
         let height: u32 = width * image.height() / image.width();
         let scaled = image.resize_exact(width, height, filter);
@@ -259,7 +260,9 @@ impl App {
                 image::ImageReader::open(img_path.clone())
                     .unwrap()
                     .decode()
-                    .unwrap_or_default(),
+                    .unwrap_or_default()
+                    // Contrast
+                    .adjust_contrast(self.contrast * 2.0),
             );
             let image = self.image_source.clone();
             self.image_scale_state = Some(picker.new_resize_protocol(image.unwrap()));
@@ -272,14 +275,14 @@ impl App {
 
     // Input section
     pub fn increment_contrast(&mut self) {
-        if self.contrast < 50 {
-            self.contrast += 1;
+        if self.contrast < 50.0 {
+            self.contrast += 1.0;
         }
     }
 
     pub fn decrement_contrast(&mut self) {
-        if self.contrast > -50 {
-            self.contrast -= 1;
+        if self.contrast > -50.0 {
+            self.contrast -= 1.0;
         }
     }
 
