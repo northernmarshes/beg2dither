@@ -2,7 +2,7 @@
 
 A TUI for image dithering with live preview.<br>
 
-![Screenshot](screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/northernmarshes/beg2dither/refs/heads/main/screenshot.png)
 
 ## Installation
 
