@@ -111,7 +111,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         Style::default(),
     );
     let functions = Span::styled(
-        "Resize (r) | Save (s) | Contrast (w/e) | Exit (q)",
+        "Resize (r) | Save (s) | Contrast (w/e) | Invert (i) | Exit (q)",
         Style::default(),
     );
     let controls: Vec<Line<'_>> = vec![algorithms.into(), functions.into()];

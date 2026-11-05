@@ -69,6 +69,7 @@ where
                     }
                     KeyCode::Char('w') => app.decrement_contrast(),
                     KeyCode::Char('e') => app.increment_contrast(),
+                    KeyCode::Char('i') => app.inverted ^= true,
                     KeyCode::Char('1') => {
                         app.algorithm_bar = "Raw".to_string();
                         app.show_image = ShowImage::Raw;

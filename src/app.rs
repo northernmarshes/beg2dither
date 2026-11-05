@@ -43,6 +43,7 @@ pub struct RawImage {
 
 pub struct App {
     pub path: Option<String>,
+    pub inverted: bool,
     pub contrast: f32,
     pub display: Display,
     pub input_mode: InputMode,
@@ -79,6 +80,7 @@ impl App {
         App {
             display: Display::No,
             contrast: 0.0,
+            inverted: false,
             path,
             algorithm_bar,
             input_mode: InputMode::Normal,
@@ -101,7 +103,10 @@ impl App {
         width: u32,
     ) -> Result<RawImage, ratatui_image::errors::Errors> {
         let image = image::ImageReader::open(path)?.decode()?;
-        let image = image.adjust_contrast(self.contrast * 2.0);
+        let mut image = image.adjust_contrast(self.contrast * 2.0);
+        if self.inverted {
+            image.invert();
+        }
         let filter = FilterType::Nearest;
         let height: u32 = width * image.height() / image.width();
         let scaled = image.resize_exact(width, height, filter);
@@ -264,8 +269,11 @@ impl App {
                     // Contrast
                     .adjust_contrast(self.contrast * 2.0),
             );
-            let image = self.image_source.clone();
-            self.image_scale_state = Some(picker.new_resize_protocol(image.unwrap()));
+            let mut image = self.image_source.clone().unwrap();
+            if self.inverted == true {
+                image.invert();
+            }
+            self.image_scale_state = Some(picker.new_resize_protocol(image));
         }
         if fe.current().path.is_dir() {
             self.display = Display::No;
