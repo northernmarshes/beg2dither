@@ -57,7 +57,7 @@ where
                             }
                         }
                     }
-                    KeyCode::Char('r') => match app.display {
+                    KeyCode::Char('w') => match app.display {
                         Display::Yes => {
                             app.input_mode = InputMode::Editing;
                             app.snackbar = "Please insert pixel width".to_string();
@@ -67,8 +67,8 @@ where
                     KeyCode::Esc => {
                         app.input_mode = InputMode::Normal;
                     }
-                    KeyCode::Char('w') => app.decrement_contrast(),
-                    KeyCode::Char('e') => app.increment_contrast(),
+                    KeyCode::Char('e') => app.decrement_contrast(),
+                    KeyCode::Char('r') => app.increment_contrast(),
                     KeyCode::Char('i') => app.inverted ^= true,
                     KeyCode::Char('1') => {
                         app.algorithm_bar = "Raw".to_string();

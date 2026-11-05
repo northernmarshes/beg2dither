@@ -59,7 +59,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
             InputMode::Editing => Style::default().fg(Color::Yellow),
         })
         .alignment(Alignment::Center)
-        .block(Block::bordered().title("Width (r)"));
+        .block(Block::bordered().title("Width (w)"));
     f.render_widget(input, explorer_chunks[2]);
     match app.input_mode {
         InputMode::Normal => {}
@@ -74,7 +74,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     //
     let title_block = Block::default()
         .borders(Borders::ALL)
-        .title("Contrast (w/e)");
+        .title("Contrast (e/r)");
     let contrast_string = app.contrast.to_string();
     let title = Paragraph::new(Text::styled(
         contrast_string,
@@ -114,7 +114,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         Style::default(),
     );
     let functions = Span::styled(
-        "Resize (r) | Save (s) | Contrast (w/e) | Invert (i) | Exit (q)",
+        "Width (w) | Save (s) | Contrast (e/r) | Invert (i) | Exit (q)",
         Style::default(),
     );
     let controls: Vec<Line<'_>> = vec![algorithms.into(), functions.into()];
