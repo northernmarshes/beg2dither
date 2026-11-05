@@ -36,6 +36,7 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
             Constraint::Length(3),  // current algorithm
             Constraint::Length(41), // file explorer
             Constraint::Length(3),  // width
+            Constraint::Length(3),  // width
         ])
         .split(main_chunks[0]);
 
@@ -63,6 +64,23 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         InputMode::Editing => f.set_cursor_position(Position::new(
             explorer_chunks[2].x + app.character_index as u16 + 1,
             explorer_chunks[2].y + 1,
+        )),
+    }
+
+    // CONTRAST
+    let input = Paragraph::new(app.input.to_string())
+        .style(match app.input_mode {
+            InputMode::Normal => Style::default(),
+            InputMode::Editing => Style::default().fg(Color::Yellow),
+        })
+        .block(Block::bordered().title("Contrast (w/e)"));
+    f.render_widget(input, explorer_chunks[3]);
+    match app.input_mode {
+        InputMode::Normal => {}
+        #[expect(clippy::cast_possible_truncation)]
+        InputMode::Editing => f.set_cursor_position(Position::new(
+            explorer_chunks[3].x + app.character_index as u16 + 1,
+            explorer_chunks[3].y + 1,
         )),
     }
 
@@ -95,7 +113,10 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
         "Raw (1) | Floyd Steinberg (2) | Stucki (3) | Jarvis (4)| Atkinson (5) | None (6)",
         Style::default(),
     );
-    let functions = Span::styled("Resize (r) | Save (s) | Exit (q)", Style::default());
+    let functions = Span::styled(
+        "Resize (r) | Save (s) | Contrast (w/e) | Exit (q)",
+        Style::default(),
+    );
     let controls: Vec<Line<'_>> = vec![algorithms.into(), functions.into()];
     f.render_widget(
         Paragraph::new(controls)

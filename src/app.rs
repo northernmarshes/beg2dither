@@ -119,6 +119,7 @@ impl App {
     ) -> Result<RawImage, Errors> {
         let dither_type = match self.show_image {
             //TODO: Raw should be somehow omitted, doesn't need dither
+            // try with _ => DitherMethod::None;
             ShowImage::Raw => DitherMethod::None,
             ShowImage::FloydSteinberg => DitherMethod::FloydSteinberg,
             ShowImage::Stucki => DitherMethod::Stucki,
