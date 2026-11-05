@@ -68,21 +68,18 @@ pub fn ui(f: &mut Frame, fe: &mut FileExplorer, app: &mut App) {
     }
 
     // CONTRAST
-    let input = Paragraph::new(app.input.to_string())
-        .style(match app.input_mode {
-            InputMode::Normal => Style::default(),
-            InputMode::Editing => Style::default().fg(Color::Yellow),
-        })
-        .block(Block::bordered().title("Contrast (w/e)"));
-    f.render_widget(input, explorer_chunks[3]);
-    match app.input_mode {
-        InputMode::Normal => {}
-        #[expect(clippy::cast_possible_truncation)]
-        InputMode::Editing => f.set_cursor_position(Position::new(
-            explorer_chunks[3].x + app.character_index as u16 + 1,
-            explorer_chunks[3].y + 1,
-        )),
-    }
+    //
+    let title_block = Block::default()
+        .borders(Borders::ALL)
+        .title("Contrast (w/e)");
+    let contrast_string = app.contrast.to_string();
+    let title = Paragraph::new(Text::styled(
+        contrast_string,
+        Style::default().fg(Color::Green),
+    ))
+    .alignment(Alignment::Center)
+    .block(title_block);
+    f.render_widget(title, explorer_chunks[3]);
 
     // EXPLORER
     f.render_widget_ref(fe.widget(), explorer_chunks[1]);

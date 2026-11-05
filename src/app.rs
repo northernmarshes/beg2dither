@@ -43,6 +43,7 @@ pub struct RawImage {
 
 pub struct App {
     pub path: Option<String>,
+    pub contrast: u8,
     pub display: Display,
     pub input_mode: InputMode,
     pub show_image: ShowImage,
@@ -77,6 +78,7 @@ impl App {
         let input = output_width.to_string();
         App {
             display: Display::No,
+            contrast: 0,
             path,
             algorithm_bar,
             input_mode: InputMode::Normal,
