@@ -13,7 +13,7 @@ If you do not have Rust installed follow the [instructions](https://rust-lang.or
 Install:
 
 ```bash
-cargo install beg2dither
+cargo install beg2dither --locked
 ```
 
 and run:
@@ -29,7 +29,7 @@ Clone the repository and run in release mode:
 ``` bash
 git clone https://github.com/northernmarshes/beg2dither
 cd beg2dither
-cargo run --release
+cargo run --release --locked
 ```
 
 ## Update
@@ -44,7 +44,7 @@ cargo install cargo-update
 And run:
 
 ```bash
-cargo install-update beg2dither
+cargo install-update beg2dither --locked
 ```
 
 ## Algorithms
